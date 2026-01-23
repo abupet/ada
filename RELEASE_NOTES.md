@@ -1,5 +1,8 @@
 # Release Notes (cumulative)
 
+## v6.17.5 (2026-01-22)
+Fix/Behavior/Limitazione: aggiunta pagina Debug con strumenti test e cache spostati fuori dalle pagine normali, voce Debug visibile solo con Debug attivo e ritorno automatico a Visita quando disattivato; gli strumenti debug restano disponibili solo con toggle ON.
+
 ## v6.17.4 (2026-01-22) — Fix CSP / handler click + logging
 - **Fix**: aggiunto fallback CSP-safe per i pulsanti (binding eventi via `addEventListener`) per evitare casi in cui alcuni `onclick` inline vengano ignorati.
 - **Debug**: se un handler genera eccezione, viene loggato in `ADA.log` e mostrato un toast di errore.

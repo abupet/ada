@@ -147,6 +147,7 @@ function initNavigation() {
 }
 
 function navigateToPage(page) {
+    if (page === 'debug' && !debugLogEnabled) page = 'recording';
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
     const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
     if (navItem) navItem.classList.add('active');
@@ -326,9 +327,10 @@ function restoreTextDrafts() {
 function restoreLastPage() {
     const lastPage = localStorage.getItem('ada_current_page');
     const scrollPosition = localStorage.getItem('ada_scroll_position');
-    
-    if (lastPage) {
-        navigateToPage(lastPage);
+    const safePage = (!debugLogEnabled && lastPage === 'debug') ? 'recording' : lastPage;
+
+    if (safePage) {
+        navigateToPage(safePage);
         if (scrollPosition) {
             setTimeout(() => {
                 const mainContent = document.querySelector('.main-content');
@@ -687,8 +689,19 @@ function updateDebugToolsVisibility() {
     const dbg = !!debugLogEnabled;
     const el1 = document.getElementById('debugTestTools');
     const el2 = document.getElementById('audioCacheTools');
+    const nav = document.getElementById('nav-debug');
+    const page = document.getElementById('page-debug');
     if (el1) el1.style.display = dbg ? '' : 'none';
     if (el2) el2.style.display = dbg ? '' : 'none';
+    if (nav) nav.style.display = dbg ? '' : 'none';
+    if (page) page.style.display = dbg ? '' : 'none';
+
+    if (!dbg) {
+        const activePage = document.querySelector('.page.active');
+        if (activePage && activePage.id === 'page-debug') {
+            navigateToPage('recording');
+        }
+    }
 
     // Refresh cache info when shown
     if (dbg) {

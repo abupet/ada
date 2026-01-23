@@ -50,6 +50,7 @@
                 
                 <div class="nav-section">SISTEMA</div>
                 <div class="nav-item" data-page="settings">⚙️ Impostazioni</div>
+                <div class="nav-item" id="nav-debug" data-page="debug" style="display:none;">🛠 Debug</div>
                 <div class="nav-item" onclick="logout()">🚪 Esci</div>
             </nav>
         </aside>
@@ -131,17 +132,6 @@
                             <input type="file" id="textFileInput" accept=".txt,.text" style="display:none" onchange="handleTextUpload(event)">
                             <p style="font-size: 12px; color: #888; margin-top: 5px;">Audio: MP3, WAV, WEBM, OGG, M4A | Testo: TXT</p>
 
-                            <!-- Debug-only test helpers (visible only when Debug attivo è ON) -->
-                            <div id="debugTestTools" style="display:none; margin-top: 12px;">
-                                <p style="margin: 10px 0 8px; color: #666; font-size: 12px;">🧪 Strumenti di test (debug)</p>
-                                <div class="button-row">
-                                    <button class="btn btn-secondary" onclick="triggerLongAudioTestUpload()">🧪 Carica audio lungo (test chunking)</button>
-                                    <button class="btn btn-secondary" onclick="triggerLongTextTestUpload()">🧪 Carica testo lungo (test append)</button>
-                                </div>
-                                <input type="file" id="longAudioTestInput" accept="audio/*,.webm,.mp3,.wav,.m4a,.mp4,.ogg" style="display:none" onchange="handleLongAudioTestUpload(event)">
-                                <input type="file" id="longTextTestInput" accept=".txt,.text" style="display:none" onchange="handleLongTextTestUpload(event)">
-                                <p style="font-size: 11px; color: #888; margin-top: 6px;">Audio test: processa il file come se fossero chunk. Testo test: simula arrivo incrementale per stressare append/persistenza.</p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -931,14 +921,6 @@
                         </div>
                     </div>
 
-                    <div id="audioCacheTools" style="display:none; margin-top: 12px;">
-                        <p style="font-size: 12px; color: #666; margin: 0 0 8px;">Cache audio di test (salvata solo con Debug ON)</p>
-                        <div class="button-row">
-                            <button class="btn btn-secondary" onclick="exportSavedAudioChunks()">📦 Esporta file audio di test salvati</button>
-                            <button class="btn btn-secondary" onclick="clearSavedAudioChunks()">🗑️ Cancella file audio di test salvati</button>
-                        </div>
-                        <p id="audioCacheInfo" style="font-size: 12px; color: #888; margin-top: 6px;"></p>
-                    </div>
                 </div>
 
                 <div class="card">
@@ -965,6 +947,31 @@
                     <h3 style="margin-top: 20px;">Informazioni</h3>
                         <p><strong>Versione:</strong> ADA v6.17.4</p>
                     <p><strong>Novità v6.17.3:</strong> Registrazione lunga a chunk con trascrizione in parallelo, profili automatici per dispositivo, UI runtime della coda, cache audio test e debug avanzato.</p>
+                </div>
+            </div>
+
+            <!-- Page: Debug -->
+            <div id="page-debug" class="page" style="display:none;">
+                <div class="page-header">
+                    <h2>🛠 Debug</h2>
+                </div>
+                <div id="debugTestTools" class="card" style="display:none;">
+                    <p style="margin: 0 0 10px; color: #666; font-size: 12px;">🧪 Strumenti di test (debug)</p>
+                    <div class="button-row">
+                        <button class="btn btn-secondary" onclick="triggerLongAudioTestUpload()">🧪 Carica audio lungo (test chunking)</button>
+                        <button class="btn btn-secondary" onclick="triggerLongTextTestUpload()">🧪 Carica testo lungo (test append)</button>
+                    </div>
+                    <input type="file" id="longAudioTestInput" accept="audio/*,.webm,.mp3,.wav,.m4a,.mp4,.ogg" style="display:none" onchange="handleLongAudioTestUpload(event)">
+                    <input type="file" id="longTextTestInput" accept=".txt,.text" style="display:none" onchange="handleLongTextTestUpload(event)">
+                    <p style="font-size: 11px; color: #888; margin-top: 6px;">Audio test: processa il file come se fossero chunk. Testo test: simula arrivo incrementale per stressare append/persistenza.</p>
+                </div>
+                <div id="audioCacheTools" class="card" style="display:none;">
+                    <p style="font-size: 12px; color: #666; margin: 0 0 8px;">Cache audio di test (salvata solo con Debug ON)</p>
+                    <div class="button-row">
+                        <button class="btn btn-secondary" onclick="exportSavedAudioChunks()">📦 Esporta file audio di test salvati</button>
+                        <button class="btn btn-secondary" onclick="clearSavedAudioChunks()">🗑️ Cancella file audio di test salvati</button>
+                    </div>
+                    <p id="audioCacheInfo" style="font-size: 12px; color: #888; margin-top: 6px;"></p>
                 </div>
             </div>
 
