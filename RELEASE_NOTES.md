@@ -1,5 +1,10 @@
 # Release Notes (cumulative)
 
+## v6.17.7 (2026-01-22)
+- **Fix**: aggiunta intestazione con versione in `specs/README.md`.
+- **Behavior**: nessuna modifica funzionale.
+- **Limitazioni**: nessuna nuova limitazione.
+
 ## v6.17.6 (2026-01-22)
 - **Fix**: aggiunti `data-testid` ai pulsanti e alle aree di stato/log per facilitare i test automatici.
 - **Behavior**: nessuna modifica funzionale.
