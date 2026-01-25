@@ -1,0 +1,24 @@
+name: Long tests (manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  long:
+    runs-on: ubuntu-latest
+    environment: ci
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - run: npm ci
+      - run: npx playwright install --with-deps
+
+      - name: Run @long tests (manual)
+        env:
+          ADA_TEST_PASSWORD: ${{ secrets.ADA_TEST_PASSWORD }}
+        run: npx playwright test --project=chromium --grep @long

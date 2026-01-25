@@ -1,0 +1,277 @@
+Signora: Pronto? Dottore, mi scusi se chiamo così… io… il mio husky, Neve… ha fatto una cosa terribile. Tremava tutto e poi… è caduto di lato, con le zampe rigide, e… sembrava che non respirasse.
+Veterinario: Signora, respiri un attimo. Mi dica dove siete adesso: a casa o in strada?
+Signora: A casa, in cucina. Io l’ho messo sul tappeto. Oddio, adesso è… è come stanco, mi guarda ma è stranissimo. È la prima volta, credo… cioè no, non lo so.
+Veterinario: Va bene. Quello che descrive sembra una crisi epilettica. È finita adesso la fase in cui si irrigidiva e scuoteva?
+Signora: Sì, sì. Però è durata tantissimo… dieci secondi… no, forse due minuti… anzi cinque, perché io ho guardato l’orologio ma non capivo più niente.
+Veterinario: Capisco. Adesso Neve è cosciente? Si alza? Cammina?
+Signora: Si alza ma va a zig-zag, come ubriaco. E sbava… ma sbavava anche prima… o forse è acqua perché gli ho bagnato il muso. Io gli ho messo le dita in bocca perché pensavo che si mordesse la lingua…
+Veterinario: Ok, la prossima volta non metta le mani in bocca: potrebbe morderla involontariamente. Durante una crisi bisogna solo mettere il cane in sicurezza, lontano da spigoli o scale, e cronometrare.
+Signora: Sì… mi scusi. È che ho avuto paura. Lui… ha fatto anche pipì, credo. O magari era già bagnato perché aveva rovesciato la ciotola.
+Veterinario: È abbastanza comune che durante una crisi ci sia perdita di urine. Mi dice l’età di Neve?
+Signora: Ha… cinque anni. No, aspetti: io l’ho preso che ne aveva due… e adesso sono tre anni che è con me… quindi sì, cinque. Però la signora che me l’ha dato diceva che forse era più giovane. Quattro?
+Veterinario: Ok, circa quattro-cinque anni. Pesa più o meno?
+Signora: Quattordici chili. No, scusi, dodici e mezzo. L’ultima volta dal toelettatore era 13. Non so.
+Veterinario: Non si preoccupi. Ha mai avuto episodi simili prima? Anche più leggeri, tipo svenimenti, tremori, fissare il vuoto?
+Signora: No, mai… cioè… una volta in estate, a luglio, aveva fatto una cosa tipo… era rimasto fermo e poi era caduto seduto. Ma io pensavo fosse il caldo. Non ha tremato così, però aveva gli occhi… come se non mi vedesse.
+Veterinario: Questo è importante. Oggi prima della crisi ha mangiato qualcosa di insolito? Farmaci, cioccolato, gomme da masticare, lumachicida, detersivi?
+Signora: Allora… io… cioè, stamattina ha rubato un pezzettino di torta. Però era piccolissimo! Era al cacao… ma era tipo una briciola, giuro. E poi in giardino… mio marito ha messo un prodotto per le formiche. Ma non so se Neve ci è andato vicino. Oh Dio, forse sì.
+Veterinario: Capito. Prodotti per insetti e alcune sostanze possono scatenare sintomi neurologici. Neve ha vomitato? Ha diarrea?
+Signora: Ha vomitato ieri sera… ma era perché aveva mangiato troppo, secondo me. Oggi no. Però adesso ansima e cerca l’acqua. Gli ho dato da bere ma poi non so se è meglio non dargliela.
+Veterinario: Piccoli sorsi vanno bene se riesce a deglutire, ma non forzarlo. Mi serve sapere: la crisi si è ripetuta più di una volta oggi?
+Signora: No, solo questa. Però dopo… ha fatto come dei piccoli scatti, tipo il muso che si muoveva, e io ho pensato: ricomincia? Non lo so se contano come seconda crisi.
+Veterinario: Potrebbe essere la fase post-crisi o piccoli miocloni. Dobbiamo visitarlo oggi. Può portarlo in clinica subito?
+Signora: Sì, sì, certo. Quanto ci metto… dieci minuti. Però ho paura che in macchina succeda di nuovo.
+Veterinario: Se succede, si fermi in sicurezza, abbassi le luci se può, tenga Neve su una superficie piana o sul sedile con un asciugamano, e non lo trattenga con forza. Cronometri e mi richiami. Ora: lo tenga al caldo e in un ambiente tranquillo.
+Signora: Va bene. Dottore, io però… devo dirle una cosa: lui prende dei farmaci, ma non so se contano. Cioè… una volta gli hanno dato del cortisone per la pelle. E io ogni tanto gli do quelle gocce calmanti… naturali… valeriana… o melatonina? Non ricordo il nome.
+Veterinario: Ok, me lo dica quando arriva e, se può, porti le confezioni o una foto. Neve è in regola con antiparassitario e vaccinazioni?
+Signora: Sì… cioè, i vaccini… credo. Li ha fatti quando l’ho preso. Poi l’anno scorso forse no perché eravamo in vacanza. Però ha fatto il richiamo… o no… mi confondo. Antiparassitario sì: gli ho dato una compressa tre settimane fa, quella che dura tre mesi.
+Veterinario: Perfetto, porti anche il libretto se lo trova. Un’ultima cosa: Neve dopo la crisi ha riconosciuto la casa? È agitato, cieco temporaneamente, urta contro i mobili?
+Signora: Sì! Sì, urta. È come se non capisse. E mi segue, ma poi si ferma e guarda il muro. Mi fa paura.
+Veterinario: È una fase post-ictale, può durare minuti o anche un’oretta. L’importante è che non cada e non si faccia male. Signora, venga subito: lo visitiamo, controlliamo temperatura, glicemia, e valutiamo se ci sono segni di tossici. Se serve, facciamo esami del sangue e, in seguito, un percorso neurologico.
+Signora: Va bene… sto prendendo le chiavi. Neve, amore, vieni… Oh Dio, dottore… lui mi guarda e scodinzola, ma è come se fosse un altro cane.
+Veterinario: Capisco, ma sta facendo la cosa giusta chiamandomi e portandolo. Ci vediamo tra poco. Se la crisi ricomincia e dura più di cinque minuti, mi chiami subito o vada direttamente in pronto soccorso veterinario.
+Signora: Sì. Arrivo. Grazie, davvero… mi scusi se sono in panico.
+Veterinario: Nessun problema. A tra poco, signora.
+VISITA 1 — Dermatologia veterinaria (Primo incontro)
+Clinica: Ambulatorio Dermatologia — Dott.ssa Anna Comi
+Data: (fittizia) 18/01/2026
+Paziente: “Neve”, Siberian Husky femmina, 3 anni e 2 mesi
+Proprietaria: Maria Pasa
+
+[In sala visita, Neve ansima e si gratta con la zampa posteriore. Maria tiene il guinzaglio corto, visibilmente in ansia.]
+
+Comi: Ciao Maria, piacere. Io sono la dottoressa Comi. Lei è Neve, giusto?
+Pasa: Sì… sì, Neve. È bravissima, però… guardi come si gratta. Io non dormo più.
+Comi: Capisco, vediamo di mettere ordine. Da quanto tempo va avanti il prurito?
+Pasa: Allora… è iniziato a novembre, credo. O forse fine ottobre. Però a dicembre era peggiorata tantissimo. Poi… a Natale sembrava un po’ meglio, e poi di nuovo malissimo.
+Comi: Quindi andamento altalenante. Le zone più colpite?
+Pasa: Le orecchie soprattutto, le scuote e piange. Poi le zampe: si lecca tra le dita fino a farsi rosso. E la pancia… sì, la pancia sotto, l’inguine. Ah e anche dietro la coda ogni tanto.
+Comi: Le hai visto lesioni? croste, pustole, cattivo odore?
+Pasa: Odore sì, tipo… “di lievito”? non so come dire. E a volte ci sono puntini rossi, e poi delle crosticine. Ma magari me le invento… io guardo troppo.
+Comi: Non te le inventi, spesso c’è odore per infezioni secondarie. Ha avuto episodi di diarrea o vomito?
+Pasa: Vomito no… cioè sì una volta, dopo che ha rubato una crosta di pizza. Diarrea… non proprio, però le feci non sono sempre uguali. A volte morbide. Ma magari è lo stress.
+Comi: Alimentazione: cosa mangia?
+Pasa: Crocchette al salmone… o al pollo, aspetti… le ho cambiate due volte. Prima pollo, poi “sensitive” al pesce. E ogni tanto le do un pezzettino di formaggio, o biscotti. E le orecchie di maiale essiccate… però ho smesso.
+Comi: Quanti “ogni tanto”?
+Pasa: Eh… boh, due o tre volte a settimana? Però piccolo.
+Comi: Ok. Antiparassitario: usa qualcosa regolarmente? pulci, zecche?
+Pasa: Sì certo… le metto la pipetta. Però ad agosto l’ho saltata perché eravamo in montagna e pensavo non servisse. Poi a ottobre l’ho rimessa. A dicembre forse ho fatto tardi di una settimana. Però non ho visto pulci.
+Comi: Non vederle non significa non ci siano. In dermatologia, la prima cosa è escludere bene i parassiti. In casa ci sono altri animali?
+Pasa: Un gatto, Mirtillo. Ma lui non ha niente.
+Comi: Neve frequenta parchi, pensioni, toelettature?
+Pasa: Parco sì tutti i giorni. Pensione no. Toelettatura… la lavo io. Però con uno shampoo “del supermercato”, perché è bianco e volevo farla profumare.
+Comi: Ok. Farmaci già provati?
+Pasa: Il mio veterinario mi ha dato un cortisonico… non ricordo il nome, in pastiglie per cinque giorni. Ha fatto miracoli, poi appena finito… peggio. E poi un antibiotico per l’orecchio. Ah e gocce auricolari, ma Neve non si fa, si divincola, io ho paura di farle male.
+Comi: Hai interrotto le gocce?
+Pasa: Sì… cioè… le ho fatte tre giorni e poi ho saltato, poi ho ricominciato. Lo so, ho sbagliato, però lei urla.
+Comi: Non ti giudico, succede spesso. Però è importante: terapie “a metà” possono non funzionare e confondere il quadro.
+
+[Comi prende appunti, poi si avvicina a Neve, la fa salire sul tavolo, la palpa con calma. Neve si lamenta quando si toccano le orecchie.]
+
+Comi: Ok Neve, brava. Allora: vedo eritema (rossore) tra le dita, qualche escoriazione da leccamento, e qui sull’addome macchie e piccole papule. Le orecchie: molto cerume scuro, odore, e la cute è ispessita. Il mantello è bello fitto ma ci sono aree con pelo spezzato vicino ai garretti.
+Pasa: Quindi è grave?
+Comi: È fastidioso, ma non per forza “grave”. Dobbiamo capire la causa. In dermatologia ci sono spesso più componenti: una causa primaria (allergia, parassiti, intolleranza alimentare) e poi infezioni secondarie (batteri o lieviti come Malassezia) che amplificano il prurito.
+
+Pasa: Allergia? Ma a cosa? Io pulisco casa, uso detersivi delicati…
+Comi: Le allergie non sono “sporco”. Le diagnosi differenziali principali in un husky con questo quadro sono:
+1) Dermatite atopica (allergia ambientale: pollini, acari, muffe).
+2) Reazione avversa al cibo (intolleranza/allergia alimentare).
+3) Dermatite allergica da pulci (anche con poche pulci).
+4) Parassiti come Demodex o Sarcoptes (meno probabile ma da escludere).
+5) Infezione batterica superficiale / Malassezia.
+Poi ci sono cause endocrine (ipotiroidismo) o disordini del pelo, ma prima guardiamo le più comuni.
+
+Pasa: E come si fa a capirlo?
+Comi: Con un percorso. Oggi farei:
+- Citologia cutanea (scotch test e impronta): per vedere lieviti e batteri.
+- Citologia auricolare (tampone orecchio): per capire se c’è Malassezia o batteri e scegliere la terapia.
+- Raschiato cutaneo profondo e tricomiscopia: per cercare acari.
+- Se necessario, coltura batterica (se sospetto resistenze).
+E poi impostiamo un piano: antiparassitario efficace + terapia per le infezioni secondarie + controllo del prurito. Parallelamente, se il quadro lo suggerisce, faremo una dieta ad esclusione di 8 settimane.
+
+Pasa: Otto settimane? Ma io le do già “sensitive”…
+Comi: “Sensitive” non è una dieta di eliminazione vera. Serve una dieta con una sola proteina nuova o idrolisata, e soprattutto ZERO extra: niente biscotti, niente formaggio, niente ossi. Anche un pezzettino può falsare il test.
+Pasa: Però lei mi guarda… mi spezza il cuore.
+Comi: Lo capisco, ma è l’unico modo per rispondere alla domanda: c’è componente alimentare sì o no?
+
+[Comi prepara vetrini e fa i prelievi: scotch test sull’addome e tra le dita, tampone auricolare. Neve tollera, Maria è tesa.]
+
+Comi: Intanto al microscopio… vedo parecchi lieviti (Malassezia) nell’orecchio e anche qualche cocco batterico. Sulla cute delle zampe vedo lieviti e pochi batteri. Questo spiega l’odore e parte del prurito.
+Pasa: Quindi è un fungo?
+Comi: Malassezia è un lievito, sì. Vive normalmente sulla pelle, ma in certe condizioni prolifera. Non è “colpa tua”, è un indicatore che la barriera cutanea è alterata, spesso per allergia.
+
+Pasa: E cosa facciamo adesso?
+Comi: Piano in 3 livelli:
+A) Controllo parassiti: un antiparassitario sistemico (classe isoxazoline) con calendario preciso per almeno 3 mesi. Trattiamo anche il gatto con prodotto compatibile.
+B) Cura dell’otite e della cute: terapia auricolare mirata per 14 giorni, poi rivalutiamo. Per la cute: shampoo medicato 2-3 volte a settimana per 3 settimane (tempo di posa 10 minuti), poi scalare. Se Neve non si fa bagnare, troviamo un compromesso con mousse/ salviette.
+C) Controllo del prurito e infiammazione: un farmaco antiprurito (es. oclacitinib o in alternativa iniezione di lokivetmab) per spegnere il circuito prurito-infiammazione mentre curiamo infezioni e cerchiamo la causa. Eviterei cortisone lungo perché può mascherare infezioni.
+
+Pasa: Ma gli antiprurito sono “pesanti”? Ho letto su internet cose terribili…
+Comi: Internet fa paura. Ogni farmaco ha pro e contro. Ti spiego l’obiettivo: voglio che Neve smetta di grattarsi, così la pelle può guarire e noi possiamo interpretare i segnali. Se continua a traumatizzarsi, qualsiasi piano fallisce.
+Pasa: Ok… io voglio solo che stia bene.
+
+Comi: Esami aggiuntivi: oggi farei anche un emocromo e profilo biochimico di base prima di eventuali antifungini sistemici, e un controllo tiroide se non risponde come previsto. Ma iniziamo con il minimo necessario.
+Pasa: E quanto tempo ci vuole?
+Comi: In dermatologia spesso settimane o mesi. Non è una “cura in 3 giorni”. Però già nelle prime 2 settimane dovremmo vedere meno prurito e orecchie meno dolorose.
+
+[Comi consegna una “ricetta fittizia” e un foglio istruzioni.]
+
+Comi: Ti scrivo tutto chiaro:
+1) Antiparassitario sistemico: una somministrazione oggi, poi ripetere secondo calendario. (Segno le date.)
+2) Terapia auricolare: pulizia con detergente otologico ogni 2 giorni, poi applicare gocce prescritte 1 volta al giorno per 14 giorni. Massaggia la base dell’orecchio. Se Neve si agita, fai due persone: una tiene e premia con carezze, l’altra applica.
+3) Shampoo medicato: 2-3 volte/settimana, posa 10 minuti, risciacquo accurato. Asciugare bene.
+4) Antiprurito: compresse per 14 giorni, poi riduciamo se migliora.
+5) Dieta: per ora non cambiamo subito, perché stiamo iniziando molte cose. Tra 10 giorni, se tutto va bene, ti do la dieta di eliminazione e le istruzioni “zero extra”.
+
+Pasa: Io ci provo… ma se salto una dose?
+Comi: Se salti, scrivilo. Preferisco sapere la verità, così capiamo cosa è successo. Mandami anche foto delle lesioni una volta a settimana.
+Pasa: Va bene. E se peggiora?
+Comi: Se peggiora molto, se compare pus, febbre, apatia, chiamami subito. Altrimenti ci rivediamo tra 4 settimane con: diario prurito (0-10), foto, e se possibile porta un campione di crocchette e gli snack che usavi.
+
+Pasa: Grazie… mi sento già un po’ più tranquilla.
+Comi: Bene. Neve è giovane e ha buone chance di stare molto meglio. Andiamo passo per passo.
+VISITA 2 — Controllo dermatologico (Dopo 1 mese)
+Clinica: Ambulatorio Dermatologia — Dott.ssa Anna Comi
+Data: (fittizia) 18/02/2026
+Paziente: “Neve”, Siberian Husky femmina, 3 anni e 3 mesi
+Proprietaria: Maria Pasa
+
+[Maria entra con Neve. Neve sembra più tranquilla ma si lecca ancora le zampe. Maria ha una busta con scontrini e una lista scritta a mano.]
+
+Comi: Ciao Maria, ciao Neve! Come è andato questo mese?
+Pasa: Allora… meglio, però non bene. Cioè: le orecchie molto meglio, non piange più quando le tocco. Però le zampe… continua. E ogni tanto la pancia torna rossa. E io ho paura che sia di nuovo come prima.
+Comi: Ok, già un miglioramento sulle orecchie è un buon segnale. Hai portato il diario prurito?
+Pasa: Sì… più o meno. Ho scritto dei numeri, ma poi mi dimenticavo. Tipo: prima era 9 su 10, adesso forse 6. Però certe sere sembra 8.
+Comi: Va bene. Mi racconti le terapie: antiparassitario?
+Pasa: L’ho fatto il giorno stesso, poi dovevo rifarlo dopo… 4 settimane? Io l’ho fatto dopo 5 perché mi è arrivato tardi il prodotto. Però l’ho fatto!
+Comi: Ok, ritardo di una settimana può contare, ma vediamo. Shampoo?
+Pasa: All’inizio sì, 3 volte a settimana. Poi Neve ha iniziato a odiare il bagno e io ho ridotto a una volta. Però uso le salviette.
+Comi: Le salviette sono un aiuto, ma per Malassezia lo shampoo medicato è più efficace. Terapia auricolare: completata?
+Pasa: Sì. Oddio… ho saltato due giorni perché eravamo dai miei. Però poi ho finito.
+Comi: Antiprurito?
+Pasa: Le compresse… all’inizio perfette. Poi ho provato a dimezzare prima dei 14 giorni, perché mi sembrava già meglio, e volevo “non darle troppa roba”.
+Comi: Capito. Questo può spiegare perché il prurito non si è stabilizzato.
+
+[Comi visita Neve: orecchie, interdigitali, addome, regione perianale. Fa scotch test su zampe e addome.]
+
+Comi: Le orecchie oggi: cerume quasi normale, lieve arrossamento. Bene. Zampe: ancora eritema e saliva, e qui vedo un po’ di pododermatite con pelo brunito. Addome: arrossamento lieve. Ora guardo al microscopio…
+Pasa: È tornata la Malassezia?
+Comi: Sulle zampe vedo ancora diversi lieviti, più di quanto vorrei. Batteri pochi. Quindi l’infezione da Malassezia non è completamente risolta, soprattutto nelle zone umide come tra le dita.
+
+Pasa: Ma allora lo shampoo non funziona?
+Comi: Funziona, ma serve costanza e spesso una strategia combinata: topico +, se necessario, antifungino sistemico per un periodo breve. Prima però voglio essere sicura che non ci sia un fattore scatenante non controllato: allergia ambientale, alimentare, o un parassita come Sarcoptes che dà prurito intenso anche senza molte lesioni.
+Pasa: Sarcoptes? tipo scabbia?
+Comi: Sì, è una forma di rogna. Negli adulti non sempre si trova al raschiato. Però Neve è migliorata con antiprurito e terapia anti-lievito, quindi Sarcoptes è meno probabile. Resta molto probabile una dermatite atopica con flare da Malassezia.
+
+Pasa: Ma perché proprio lei… io la curo tantissimo.
+Comi: L’atopia è predisposizione genetica: barriera cutanea più fragile e risposta immunitaria più “reattiva”. Non è colpa tua.
+
+Comi: Adesso ti propongo un passo in più: una dieta di eliminazione vera per 8 settimane. Sei pronta?
+Pasa: Sì… cioè… ci provo. Però… posso darle i premietti “hypoallergenic”? Ne ho comprati.
+Comi: Dipende da cosa contengono. In dieta di eliminazione servono snack compatibili con la dieta, idealmente della stessa linea idrolisata. Anche un biscotto “di pollo” può mandare all’aria il test.
+Pasa: Eh ma io le ho dato un pezzettino di prosciutto due volte… piccolissimo. Però era per farle prendere la compressa.
+Comi: Ecco, questo è un classico. Facciamo così: userai la stessa crocchetta come “premio” oppure una pasta idrolisata. Ti scrivo alternative.
+
+[Comi prende in mano i risultati degli esami del sangue fatti la settimana precedente.]
+
+Comi: Vediamo l’emocromo e biochimico: nella norma, niente che impedisca un antifungino sistemico. Bene. Allora piano aggiornato:
+1) Riprendiamo controllo Malassezia: aggiungiamo antifungino sistemico per 3-4 settimane (posologia in ricetta). Monitoriamo eventuali effetti collaterali e rifacciamo un controllo epatico se serve.
+2) Topico più mirato sulle zampe: mousse antifungina quotidiana tra le dita + asciugatura accurata dopo passeggiate.
+3) Antiprurito: ripristiniamo una dose piena per 2 settimane e poi scalare lentamente, non “taglio netto”.
+4) Dieta di eliminazione: 8 settimane rigorose, con tabella “cosa può e cosa no”.
+5) Se dopo 8 settimane c’è miglioramento netto: facciamo challenge (reintroduzione) per confermare.
+
+Pasa: E per le orecchie? posso smettere di pulirle?
+Comi: Per ora una pulizia a settimana per mantenimento, e se ricompare odore o prurito mi avvisi subito. Ti faccio vedere la tecnica, così non la traumatizzi.
+
+[Comi dimostra la pulizia, Maria prova con le mani tremanti; Neve è tollerante.]
+
+Pasa: Io ho un dubbio… potrebbe essere il detersivo con cui lavo le coperte?
+Comi: Possibile irritazione da contatto, ma meno tipica. In ogni caso: usa un detersivo neutro, niente profumi, doppio risciacquo. Però la distribuzione delle lesioni e l’andamento stagionale fanno pensare più a atopia.
+
+Pasa: E l’allergy test? quello dei pollini?
+Comi: Si può fare, ma di solito lo facciamo quando abbiamo stabilizzato l’animale e vogliamo impostare immunoterapia. Prima voglio: 1) pulci davvero sotto controllo, 2) infezioni secondarie risolte, 3) dieta fatta bene. Poi, se resta prurito cronico, test intradermico o sierologico per IgE e valutiamo vaccino desensibilizzante.
+
+Pasa: Ho paura che prenda farmaci per sempre.
+Comi: L’obiettivo è trovare il minimo necessario. Alcuni cani hanno periodi e poi mantenimento leggero. Altri hanno bisogno di terapia stagionale. Ma non è “condanna”: è gestione.
+
+Comi: Ultima cosa: vorrei fare anche una coltura dal condotto auricolare se si ripresenta. Oggi non serve. E un controllo tra 4 settimane: voglio vedere le zampe con meno lieviti e un prurito più stabile.
+Pasa: Va bene. Questa volta sarò più precisa. Mi metto un allarme sul telefono.
+Comi: Ottimo. E se sbagli, me lo dici. Il nostro lavoro è anche adattare il piano alla vita reale.
+
+[Fine visita: consegna scheda dieta, calendario, e istruzioni illustrate.]
+VISITA 3 — Follow-up finale e piano di mantenimento (Quasi guarita)
+Clinica: Ambulatorio Dermatologia — Dott.ssa Anna Comi
+Data: (fittizia) 22/03/2026
+Paziente: “Neve”, Siberian Husky femmina, 3 anni e 4 mesi
+Proprietaria: Maria Pasa
+
+[Neve entra scodinzolando. Il pelo è più lucido, non si gratta in sala. Maria sembra più sollevata, ma resta un po’ apprensiva.]
+
+Comi: Ciao! Neve oggi sembra un’altra.
+Pasa: Sì… finalmente. Io quasi non ci credo. Si gratta ancora ogni tanto, ma… niente come prima. Le zampe sono quasi normali.
+Comi: Bene. Partiamo dai fatti: dieta di eliminazione l’hai fatta?
+Pasa: Sì! Questa volta sì. Ho eliminato tutto. Tranne… una volta le ho dato una briciola di pane. Ma veramente una briciola.
+Comi: Ok, una briciola non è ideale, ma se l’andamento complessivo è stato buono ci sta. Hai notato differenze con la dieta?
+Pasa: Sì. Dopo tipo 3 settimane, meno leccamento. E le feci più regolari. Però non so se era quello o i farmaci.
+Comi: È sempre difficile separare i fattori, ma la coincidenza temporale ci aiuta.
+
+Comi: Terapia antifungina sistemica: completata?
+Pasa: Sì, finita. Nessun vomito. Ho fatto come mi ha detto. E la mousse sulle zampe l’ho usata quasi ogni giorno… tranne quando pioveva e tornavamo tardi.
+Comi: Ottimo. Antiprurito: come hai scalato?
+Pasa: Ho seguito il foglio, ogni tot giorni. Quando ho provato a saltare del tutto per una settimana, ha ricominciato un po’. Quindi ora le do la dose “bassa” come da schema.
+Comi: Perfetto, questo ci dice che una componente allergica di base c’è.
+
+[Comi visita Neve accuratamente: interdigitali, addome, ascelle, orecchie. Fa citologia sulle zampe e un controllo auricolare.]
+
+Comi: Microscopio: lieviti quasi assenti, qualche cellula infiammatoria minima. Orecchie pulite, nessun odore. Cute addominale buona. Direi: infezioni secondarie risolte e barriera cutanea molto migliorata.
+Pasa: Quindi era… allergia al cibo?
+Comi: Probabilmente c’è una componente alimentare, ma potrebbe non essere l’unica. In un cane atopico spesso coesistono allergia ambientale e reazione al cibo. Il fatto che con dieta rigorosa e controllo Malassezia sia migliorata tanto è molto indicativo.
+
+Pasa: E adesso? posso tornare alle crocchette di prima?
+Comi: Qui facciamo una scelta consapevole. Abbiamo 2 strade:
+1) Continuare con la dieta che sta funzionando (idrolisata o monoproteica), come base stabile.
+2) Fare un “challenge” controllato: reintroduciamo una proteina alla volta (es. pollo) per 10-14 giorni e vediamo se ricompare prurito. Se ricompare, abbiamo una risposta più chiara.
+Pasa: Io ho paura a farla peggiorare di nuovo.
+Comi: Capisco. Possiamo rimandare il challenge a un periodo più tranquillo, per esempio quando non ci sono pollini forti, così se peggiora sappiamo che è più probabile il cibo.
+
+Pasa: E i farmaci li togliamo?
+Comi: L’obiettivo ora è mantenimento con “minima terapia efficace”. Piano di mantenimento:
+- Antiparassitario: continuiamo regolare tutto l’anno, perché anche una sola pulce può scatenare.
+- Topico: shampoo medicato non più 3 volte a settimana, ma 1 volta ogni 10-14 giorni, e mousse sulle zampe solo dopo passeggiate molto bagnate o se noti odore/rossore.
+- Orecchie: pulizia preventiva ogni 7-10 giorni, più frequente se nuota o se vedi cerume.
+- Antiprurito: proviamo a ridurre ulteriormente per gradi. Se in primavera peggiora, possiamo fare terapia “stagionale” per 2-3 mesi invece che tutto l’anno.
+- Integratori barriera (omega-3/6 o prodotti specifici) possono aiutare, non sono miracoli ma riducono i flare.
+
+Pasa: E se torna l’odore di lievito?
+Comi: Quello per me è un campanello: significa che sta tornando Malassezia. Intervieni presto con topico e mi scrivi. Prima lo prendiamo, meno farmaci sistemici servono.
+
+Pasa: Ma come faccio a capire se è “allergia” o “infezione”?
+Comi: Ti do un metodo pratico:
+- Se prurito improvviso e intenso, soprattutto orecchie/zampe, senza molta pustola: spesso allergia.
+- Se c’è odore forte, untuosità, pelle scura, cerume: spesso Malassezia.
+- Se ci sono pustole, croste gialle, collarette: più batteri.
+Ma non è sempre così netto. Per questo le citologie sono utili: in 5 minuti sappiamo.
+
+Pasa: Io mi sento in colpa perché all’inizio non seguivo bene…
+Comi: Non colpevolizzarti. È normale. L’importante è che hai imparato e Neve sta bene.
+
+Comi: Ti propongo anche una cosa per il futuro: se vuoi, possiamo fare un allergy test (sierologico o intradermico) per impostare immunoterapia. È un trattamento “di fondo” che in alcuni cani riduce molto il bisogno di farmaci, ma richiede mesi e non funziona su tutti.
+Pasa: E costa tanto?
+Comi: Ha un costo, sì. Possiamo valutarlo se in primavera vedi un peggioramento nonostante dieta e mantenimento. Per ora non è indispensabile.
+
+Pasa: Un’ultima domanda… può essere stato lo shampoo profumato che usavo?
+Comi: Può aver irritato e peggiorato la barriera, sì. Ma non è la causa principale. Ti consiglio di evitarlo e usare solo prodotti dermatologici o neutri.
+
+[Comi consegna un “piano scritto” con semafori: verde = routine, giallo = primi segnali, rosso = quando chiamare.]
+
+Comi: Routine (verde): antiparassitario, dieta stabile, pulizia orecchie, shampoo ogni 10-14 giorni.
+Primi segnali (giallo): più leccamento zampe, cerume, odore lieve → aumenta topico, foto, messaggio.
+Allarme (rosso): otite dolorosa, pustole diffuse, prurito 9/10, apatia → visita prima possibile.
+
+Pasa: Va bene. Mi sento finalmente “capace” di gestirla.
+Comi: Ed è il risultato migliore. Neve probabilmente avrà dei periodi di ricaduta, ma ora sai cosa fare. Ci rivediamo tra 3 mesi per un controllo, oppure prima se serve.
+Pasa: Grazie davvero, dottoressa.
+Comi: Brava tu e brava Neve.
+
+[Fine visita — caso quasi risolto, impostato mantenimento.]

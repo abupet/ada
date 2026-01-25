@@ -1,0 +1,8 @@
+# env files
+.env
+.env.*
+!.env.example
+
+# playwright
+test-results/
+playwright-report/
