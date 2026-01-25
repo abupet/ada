@@ -34,7 +34,7 @@ jobs:
       - name: Start server
         run: |
           nohup npm run serve > server.log 2>&1 &
-          npx wait-on http://127.0.0.1:3000
+          npx wait-on http://127.0.0.1:4173
 
       - name: Policy checks
         run: node tests/policy/policy-checks.js
@@ -68,3 +68,4 @@ jobs:
           name: server-log
           path: server.log
           if-no-files-found: ignore
+
