@@ -1,118 +1,70 @@
-name: CI
- 
+# ci.yml v1
+name: CI (PR)
+
 on:
   pull_request:
-  push:
-    branches: [ "main" ]
-  workflow_dispatch:
 
 jobs:
-  smoke:
+  test:
     runs-on: ubuntu-latest
-
-    # ✅ Use Environment secrets for CI jobs
-    environment: ci
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "npm"
-
-      - run: npm ci
-      - run: npx playwright install --with-deps
-
-      - name: Policy checks
-        run: npm run test:policy
-
-      - name: Serve local
-        run: |
-          npm run serve &
-          sleep 2
-
-      - name: Smoke E2E
-        env:
-          ADA_TEST_PASSWORD: ${{ secrets.ADA_TEST_PASSWORD }}
-        run: npm run test:smoke
-
-      - name: Upload report on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report-smoke
-          path: playwright-report
-          retention-days: 7
-
-  regression:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    needs: [smoke]
-
-    # ✅ Use Environment secrets for CI jobs
-    environment: ci
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "npm"
-
-      - run: npm ci
-      - run: npx playwright install --with-deps
-
-      - name: Serve local
-        run: |
-          npm run serve &
-          sleep 2
-
-      - name: Regression E2E
-        env:
-          ADA_TEST_PASSWORD: ${{ secrets.ADA_TEST_PASSWORD }}
-        run: npm run test:regression
-
-      - name: Upload report (always)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report-regression
-          path: playwright-report
-          retention-days: 7
-
-  deployed:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    needs: [smoke]
-
-    # ✅ This job uses a separate environment with separate secrets/policies
-    environment: deployed
+    timeout-minutes: 30
 
     env:
-      DEPLOY_URL: ${{ secrets.DEPLOY_URL }}   # ✅ directory URL: https://abupet.github.io/ada/
-      ADA_TEST_PASSWORD: ${{ secrets.ADA_TEST_PASSWORD }}
-      DEPLOYED: "1"
+      MODE: MOCK
+      STRICT_NETWORK: "0"
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "20"
           cache: "npm"
 
-      - run: npm ci
-      - run: npx playwright install --with-deps
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Deployed E2E smoke
-        run: npm run test:deployed
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
 
-      - name: Upload report on failure
+      # Avvio server nel runner (NON il tuo PC locale)
+      # Nota: se il tuo progetto usa una porta diversa, cambia 3000 e la URL.
+      - name: Start server
+        run: |
+          nohup npm run serve > server.log 2>&1 &
+          npx wait-on http://127.0.0.1:3000
+
+      - name: Policy checks
+        run: node tests/policy/policy-checks.js
+
+      - name: Smoke tests (MOCK)
+        run: npx playwright test --grep "@smoke"
+
+      - name: Regression tests (MOCK)
+        run: npx playwright test
+
+      - name: Upload Playwright report (on failure)
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-deployed
-          path: playwright-report
-          retention-days: 7
+          name: playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore
+
+      - name: Upload test-results (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/
+          if-no-files-found: ignore
+
+      - name: Upload server log (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-log
+          path: server.log
+          if-no-files-found: ignore
