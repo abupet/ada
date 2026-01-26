@@ -1,3 +1,4 @@
+// policy-checks.js v2
 const fs = require("fs");
 const path = require("path");
 
@@ -17,6 +18,11 @@ const root = process.cwd();
 const files = walk(root);
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Helpers
+const normalize = (p) => path.resolve(p).replace(/\\/g, "/");
+const isWorkflowFile = (f) => normalize(f).includes("/.github/workflows/");
+
+// ─────────────────────────────────────────────────────────────────────────────
 // POL-01 Release notes cumulativo
 const forbiddenRN = files.filter(f => {
   const b = path.basename(f);
@@ -29,6 +35,8 @@ if (forbiddenRN.length) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POL-03 No secrets nel repo (heuristic)
+// NOTE: Workflow files commonly contain references like ${{ secrets.OPENAI_API_KEY }}.
+// We intentionally exclude .github/workflows/** from secret scanning to avoid false positives.
 const secretPatterns = [
   /OPENAI[_-]?API[_-]?KEY/i,
   /BEARER\s+[A-Za-z0-9\-_\.]+/i,
@@ -42,7 +50,6 @@ const secretHits = [];
 
 // Exclude this policy checker file itself to avoid self-flagging
 const thisFileAbs = path.resolve(__filename);
-const normalize = (p) => path.resolve(p).replace(/\\/g, "/");
 const thisFileNorm = normalize(thisFileAbs);
 
 for (const f of files) {
@@ -51,6 +58,9 @@ for (const f of files) {
 
   // Skip this file itself (prevents self-flagging due to patterns like sk-...)
   if (normalize(f) === thisFileNorm) continue;
+
+  // Skip workflows to avoid false positives on ${{ secrets.* }} usage
+  if (isWorkflowFile(f)) continue;
 
   const b = path.basename(f);
   if (b === "package-lock.json") continue; // noisy
@@ -160,15 +170,17 @@ if (hits.length) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// POL-05 Tag enforcement: @long must not run in standard CI scripts
-// (Heuristic: if any workflow runs "test:long" automatically, fail)
+// POL-05 Tag enforcement: @long must not run in standard PR CI workflows
+// Allow @long in non-PR workflows (e.g. nightly/dispatch REAL).
 const longBad = [];
 for (const f of workflowFiles) {
   const txt = fs.readFileSync(f, "utf8");
-  if (/test:long|--grep\s+@long/i.test(txt)) longBad.push(f);
+  const isPRWorkflow = /\bon:\s*[\s\S]*\bpull_request\s*:/m.test(txt) || /\bpull_request\s*:/m.test(txt);
+  const hasLong = /test:long|--grep\s+@long/i.test(txt);
+  if (isPRWorkflow && hasLong) longBad.push(f);
 }
 if (longBad.length) {
-  console.error("❌ @long tests must not run in standard CI workflows. Found in:\n" + longBad.join("\n"));
+  console.error("❌ @long tests must not run in PR CI workflows. Found in:\n" + longBad.join("\n"));
   process.exit(1);
 }
 
