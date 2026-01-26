@@ -1,4 +1,4 @@
-# ci-real.yml v2
+# ci-real.yml v3
 name: CI (REAL)
 
 on:
@@ -15,7 +15,7 @@ jobs:
     env:
       MODE: REAL
       STRICT_NETWORK: "1"
-      # Define these as GitHub Actions secrets if your REAL tests require them:
+      STRICT_ALLOW_HOSTS: "cdnjs.cloudflare.com"
       ADA_TEST_PASSWORD: ${{ secrets.ADA_TEST_PASSWORD }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
