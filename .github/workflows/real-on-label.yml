@@ -1,0 +1,78 @@
+# real-on-label.yml v2
+name: CI (REAL on label)
+
+on:
+  pull_request:
+    types: [labeled, synchronize, reopened]
+
+jobs:
+  test_real_on_label:
+    # Only run when the PR has the 'run-real' label
+    if: contains(github.event.pull_request.labels.*.name, 'run-real')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    env:
+      MODE: REAL
+      STRICT_NETWORK: "1"
+      STRICT_ALLOW_HOSTS: "cdnjs.cloudflare.com"
+      ALLOW_OPENAI: "1"
+      ADA_TEST_PASSWORD: ${{ secrets.ADA_TEST_PASSWORD }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Start server
+        run: |
+          nohup npm run serve > server.log 2>&1 &
+          npx wait-on http://127.0.0.1:4173
+
+      - name: Policy checks
+        run: node tests/policy/policy-checks.js
+
+      - name: Smoke tests (REAL)
+        run: npx playwright test --grep "@smoke"
+
+      - name: Regression tests (REAL)
+        run: npx playwright test
+
+      - name: Long tests (REAL)
+        run: npx playwright test --grep "@long"
+
+      - name: Upload Playwright report (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore
+
+      - name: Upload test-results (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/
+          if-no-files-found: ignore
+
+      - name: Upload server log (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-log
+          path: server.log
+          if-no-files-found: ignore
