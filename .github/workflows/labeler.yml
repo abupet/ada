@@ -1,0 +1,37 @@
+# labeler.yml v1
+# Used by actions/labeler to auto-apply labels based on changed paths.
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/workflows/**"
+          - ".github/**"
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "tests/**"
+          - "**/*.spec.ts"
+          - "**/*.spec.js"
+          - "playwright.config.*"
+
+frontend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "index.html"
+          - "src/**"
+          - "public/**"
+          - "**/*.css"
+
+backend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "server/**"
+          - "api/**"
+          - "backend/**"
+
+docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.md"
+          - "docs/**"
