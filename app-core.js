@@ -27,7 +27,7 @@ let debugLogEnabled = true;
 
 async function login() {
     const password = document.getElementById('passwordInput').value;
-    const apiKey = await decryptApiKey(password);
+    const apiKey = await decryptApiKey(password, getApiKeyMode());
 
 // ============================================
 // JSON EXTRACTION HELPERS (robust parsing from model output)
@@ -69,7 +69,7 @@ async function checkSession() {
         try {
             const decoded = atob(session);
             const password = decoded.split(':')[0];
-            const apiKey = await decryptApiKey(password);
+            const apiKey = await decryptApiKey(password, getApiKeyMode());
             if (apiKey) {
                 API_KEY = apiKey;
                 document.getElementById('loginScreen').style.display = 'none';
@@ -101,8 +101,12 @@ async function initApp() {
     initLanguageSelectors();
     initVitalsDateTime();
     initDebugLogSetting();
+    initApiKeySelector();
     initChunkingSettings();
+    initChunkingSectionToggle();
     initVetNameSetting();
+    initClinicLogoSetting();
+    initClinicLogoSectionToggle();
     await initSpeakersDB();
     await initMultiPetSystem(); // Initialize multi-pet system
 
@@ -557,6 +561,47 @@ function initVetNameSetting() {
 }
 
 // ============================================
+// API KEY SELECTION (General vs Costs)
+// ============================================
+
+function getSessionPassword() {
+    try {
+        const session = localStorage.getItem('ada_session');
+        if (!session) return null;
+        const decoded = atob(session);
+        return decoded.split(':')[0] || null;
+    } catch (e) {
+        return null;
+    }
+}
+
+async function applyApiKeyMode(mode, { silent = false } = {}) {
+    setApiKeyMode(mode);
+    const password = getSessionPassword();
+    if (!password) return;
+    const apiKey = await decryptApiKey(password, mode);
+    if (apiKey) {
+        API_KEY = apiKey;
+        if (!silent) {
+            const label = mode === 'costs' ? 'calcolo consumi' : 'generale';
+            showToast(`API key impostata su "${label}"`, 'success');
+        }
+    } else if (!silent) {
+        showToast('API key non valida', 'error');
+    }
+}
+
+function initApiKeySelector() {
+    const selector = document.getElementById('apiKeyModeSelector');
+    if (!selector) return;
+    const mode = getApiKeyMode();
+    selector.value = mode;
+    selector.addEventListener('change', async () => {
+        await applyApiKeyMode(selector.value);
+    });
+}
+
+// ============================================
 // DEBUG LOG SETTINGS
 // ============================================
 
@@ -578,12 +623,137 @@ function toggleDebugLog(enabled) {
 }
 
 // ============================================
+// VERSION LABELS
+// ============================================
+
+function updateVersionLabels() {
+    const version = typeof ADA_VERSION === 'string' ? ADA_VERSION : '';
+    const notes = typeof ADA_RELEASE_NOTES === 'string' ? ADA_RELEASE_NOTES : '';
+    document.querySelectorAll('[data-ada-version]').forEach(el => {
+        el.textContent = version;
+    });
+    document.querySelectorAll('[data-ada-release-notes]').forEach(el => {
+        el.textContent = notes;
+    });
+    if (version) {
+        document.title = `ADA v${version} - AI Driven Abupet`;
+    }
+}
+window.updateVersionLabels = updateVersionLabels;
+
+// ============================================
+// CLINIC LOGO SETTINGS
+// ============================================
+
+const ADA_CLINIC_LOGO_KEY = 'ada_clinic_logo';
+const ADA_DEFAULT_LOGO_SRC = 'logo-anicura.png';
+const ADA_CLINIC_LOGO_SECTION_OPEN_KEY = 'ada_clinic_logo_section_open';
+
+function getClinicLogoSrc() {
+    try {
+        return localStorage.getItem(ADA_CLINIC_LOGO_KEY) || ADA_DEFAULT_LOGO_SRC;
+    } catch (e) {
+        return ADA_DEFAULT_LOGO_SRC;
+    }
+}
+
+function setClinicLogoSrc(value) {
+    try {
+        if (!value || value === ADA_DEFAULT_LOGO_SRC) {
+            localStorage.removeItem(ADA_CLINIC_LOGO_KEY);
+        } else {
+            localStorage.setItem(ADA_CLINIC_LOGO_KEY, value);
+        }
+    } catch (e) {}
+}
+
+function applyClinicLogo(src) {
+    const logo = document.getElementById('clinicLogo');
+    const preview = document.getElementById('clinicLogoPreview');
+    const hidden = document.getElementById('anicuraLogoImg');
+    if (logo) logo.src = src;
+    if (preview) preview.src = src;
+    if (hidden) {
+        hidden.src = src;
+        hidden.crossOrigin = 'anonymous';
+    }
+}
+
+function handleClinicLogoUpload(event) {
+    const input = event?.target;
+    const file = input?.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+        const src = String(reader.result || '');
+        if (!src) return;
+        setClinicLogoSrc(src);
+        applyClinicLogo(src);
+        showToast('Logo aggiornato', 'success');
+        if (input) input.value = '';
+    };
+    reader.readAsDataURL(file);
+}
+
+function resetClinicLogo() {
+    setClinicLogoSrc(ADA_DEFAULT_LOGO_SRC);
+    applyClinicLogo(ADA_DEFAULT_LOGO_SRC);
+    showToast('Logo ripristinato', 'success');
+}
+
+function initClinicLogoSetting() {
+    const input = document.getElementById('clinicLogoInput');
+    applyClinicLogo(getClinicLogoSrc());
+    if (input) input.addEventListener('change', handleClinicLogoUpload);
+}
+
+function toggleClinicLogoSection(forceOpen) {
+    const body = document.getElementById('clinicLogoSectionBody');
+    const icon = document.getElementById('clinicLogoToggleIcon');
+    if (!body) return;
+    const isOpen = typeof forceOpen === 'boolean' ? forceOpen : body.style.display === 'none';
+    body.style.display = isOpen ? '' : 'none';
+    if (icon) icon.textContent = isOpen ? '▾' : '▸';
+    try { localStorage.setItem(ADA_CLINIC_LOGO_SECTION_OPEN_KEY, isOpen ? 'true' : 'false'); } catch (e) {}
+}
+
+function initClinicLogoSectionToggle() {
+    let open = false;
+    try {
+        const stored = localStorage.getItem(ADA_CLINIC_LOGO_SECTION_OPEN_KEY);
+        if (stored !== null) open = stored !== 'false';
+    } catch (e) {}
+    toggleClinicLogoSection(open);
+}
+
+// ============================================
 // CHUNK RECORDING SETTINGS (v6.17.3)
 // ============================================
 
 const ADA_CHUNKING_ENABLED_KEY = 'ada_chunking_enabled';
 const ADA_CHUNKING_PROFILE_KEY = 'ada_chunking_profile';
 const ADA_CHUNKING_CONFIG_KEY_PREFIX = 'ada_chunking_config_';
+const ADA_CHUNKING_SECTION_OPEN_KEY = 'ada_chunking_section_open';
+
+function toggleChunkingSection(forceOpen) {
+    const body = document.getElementById('chunkingSectionBody');
+    const icon = document.getElementById('chunkingToggleIcon');
+    if (!body) return;
+    const isHidden = body.style.display === 'none' || getComputedStyle(body).display === 'none';
+    const isOpen = typeof forceOpen === 'boolean' ? forceOpen : isHidden;
+    body.style.display = isOpen ? 'block' : 'none';
+    if (icon) icon.textContent = isOpen ? '▾' : '▸';
+    try { localStorage.setItem(ADA_CHUNKING_SECTION_OPEN_KEY, isOpen ? 'true' : 'false'); } catch (e) {}
+}
+
+function initChunkingSectionToggle() {
+    let open = false;
+    try {
+        const stored = localStorage.getItem(ADA_CHUNKING_SECTION_OPEN_KEY);
+        if (stored !== null) open = stored !== 'false';
+    } catch (e) {}
+    toggleChunkingSection(open);
+}
 
 function detectRecordingProfile() {
     const ua = (navigator.userAgent || '').toString();
@@ -2235,3 +2405,11 @@ function openCostsPage() {
 
 // Initialize on load
 window.onload = checkSession;
+const runVersionLabels = () => {
+    if (typeof updateVersionLabels === 'function') updateVersionLabels();
+};
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runVersionLabels);
+} else {
+    runVersionLabels();
+}
