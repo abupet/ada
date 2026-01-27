@@ -1,4 +1,4 @@
-# real-on-label.yml v2
+# real-on-label.yml v3
 name: CI (REAL on label)
 
 on:
@@ -7,7 +7,6 @@ on:
 
 jobs:
   test_real_on_label:
-    # Only run when the PR has the 'run-real' label
     if: contains(github.event.pull_request.labels.*.name, 'run-real')
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -17,8 +16,8 @@ jobs:
       STRICT_NETWORK: "1"
       STRICT_ALLOW_HOSTS: "cdnjs.cloudflare.com"
       ALLOW_OPENAI: "1"
-      ADA_TEST_PASSWORD: ${{ secrets.ADA_TEST_PASSWORD }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      ADA_TEST_PASSWORD: ${ secrets.ADA_TEST_PASSWORD }
+      OPENAI_API_KEY: ${ secrets.OPENAI_API_KEY }
 
     steps:
       - name: Checkout
@@ -32,6 +31,13 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-ms-playwright-${{ hashFiles('package-lock.json') }}
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
@@ -76,3 +82,25 @@ jobs:
           name: server-log
           path: server.log
           if-no-files-found: ignore
+
+      - name: Write CI summary
+        if: always()
+        run: |
+          {
+            echo "## CI (REAL on label) summary"
+            echo ""
+            echo "- MODE: ${MODE}"
+            echo "- STRICT_NETWORK: ${STRICT_NETWORK}"
+            echo "- STRICT_ALLOW_HOSTS: ${STRICT_ALLOW_HOSTS:-}"
+            echo "- ALLOW_OPENAI: ${ALLOW_OPENAI:-}"
+            echo ""
+            echo "### Artifacts (available on failure)"
+            echo "- playwright-report"
+            echo "- test-results"
+            echo "- server-log"
+            echo ""
+            echo "### Useful commands (local)"
+            echo "- npm ci"
+            echo "- npm run serve  # port 4173"
+            echo "- npx playwright test --grep \"@smoke\""
+          } >> $GITHUB_STEP_SUMMARY
