@@ -2,6 +2,31 @@
 // API Keys are stored in api-keys.js
 
 let API_KEY = null;
+const ADA_API_KEY_MODE_KEY = 'ada_api_key_mode';
+
+function getApiKeyMode() {
+    try {
+        const mode = localStorage.getItem(ADA_API_KEY_MODE_KEY);
+        return mode === 'costs' ? 'costs' : 'general';
+    } catch (e) {
+        return 'general';
+    }
+}
+
+function setApiKeyMode(mode) {
+    try {
+        const value = mode === 'costs' ? 'costs' : 'general';
+        localStorage.setItem(ADA_API_KEY_MODE_KEY, value);
+    } catch (e) {}
+}
+
+function getEncryptedKeyForMode(mode) {
+    return mode === 'costs' ? ENCRYPTED_API_KEY_COSTS : ENCRYPTED_API_KEY_GENERAL;
+}
+
+function getSaltForMode(mode) {
+    return mode === 'costs' ? SALT_COSTS : SALT_GENERAL;
+}
 
 // Version
 const ADA_VERSION = '6.17.5';
@@ -401,10 +426,12 @@ async function deriveKey(password, salt) {
     );
 }
 
-async function decryptApiKey(password) {
+async function decryptApiKey(password, mode = getApiKeyMode()) {
     try {
-        const key = await deriveKey(password, SALT);
-        const data = Uint8Array.from(atob(ENCRYPTED_API_KEY), c => c.charCodeAt(0));
+        const salt = getSaltForMode(mode);
+        const encryptedKey = getEncryptedKeyForMode(mode);
+        const key = await deriveKey(password, salt);
+        const data = Uint8Array.from(atob(encryptedKey), c => c.charCodeAt(0));
         const iv = data.slice(0, 12);
         const encrypted = data.slice(12);
         const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, encrypted);
