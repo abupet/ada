@@ -888,6 +888,44 @@
 
                 <div class="card">
                     <h3>Informazioni di sistema</h3>
+                
+                <div class="card">
+                    <h3>Logo clinica</h3>
+                    <p style="color:#666;font-size:13px;margin-bottom:10px;">
+                        Carica il logo che comparirà nell'intestazione delle pagine e nei PDF esportati.
+                    </p>
+                    <div class="clinic-logo-upload">
+                        <img id="clinicLogoPreview" src="logo-anicura.png" alt="Logo clinica" class="clinic-logo-preview" data-testid="clinic-logo-preview">
+                        <div class="button-row">
+                            <label class="btn btn-secondary" data-testid="clinic-logo-upload-button">
+                                📤 Carica logo
+                                <input type="file" id="clinicLogoInput" accept="image/*" style="display:none;" data-testid="clinic-logo-input">
+                            </label>
+                            <button class="btn btn-secondary" onclick="resetClinicLogo()" data-testid="reset-clinic-logo-button">↩️ Ripristina</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>API Key</h3>
+                    <div class="form-group">
+                        <label>Chiave da usare</label>
+                        <select id="apiKeyModeSelector" data-testid="api-key-mode-selector">
+                            <option value="general">Generale</option>
+                            <option value="costs">Calcolo consumi</option>
+                        </select>
+                        <p style="font-size: 12px; color: #888; margin-top: 5px;">La scelta viene memorizzata e rimane attiva ai successivi accessi.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Sistema</h3>
+
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label>Nome veterinario</label>
+                        <input type="text" id="vetNameInput" placeholder="Es: Dott. Rossi" oninput="saveVetName(this.value)">
+                        <p style="font-size: 12px; color: #888; margin-top: 5px;">Usato in export e, dove previsto, nelle comunicazioni al proprietario</p>
+                    </div>
                     <div class="form-group" style="margin-bottom: 15px;">
                         <label style="display: flex; align-items: center; gap: 10px;">
                             <input type="checkbox" id="debugLogEnabled" onchange="toggleDebugLog(this.checked)" checked>

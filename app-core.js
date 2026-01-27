@@ -746,6 +746,7 @@ function toggleChunkingSection(forceOpen) {
 
 function initChunkingSectionToggle() {
     let open = false;
+    let open = true;
     try {
         const stored = localStorage.getItem(ADA_CHUNKING_SECTION_OPEN_KEY);
         if (stored !== null) open = stored !== 'false';
