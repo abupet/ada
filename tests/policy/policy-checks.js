@@ -1,4 +1,4 @@
-// policy-checks.js v2
+// policy-checks.js v3
 const fs = require("fs");
 const path = require("path");
 
@@ -55,6 +55,8 @@ const thisFileNorm = normalize(thisFileAbs);
 for (const f of files) {
   const ext = path.extname(f).toLowerCase();
   if (!scanExt.has(ext)) continue;
+  // Docs often contain placeholder env var names (e.g., OPENAI_API_KEY) that are not secrets.
+  // Keep policy-check strong on code/config, but skip markdown docs to avoid false positives.
   if (f.endsWith('.md')) continue;
   
   // Skip this file itself (prevents self-flagging due to patterns like sk-...)
