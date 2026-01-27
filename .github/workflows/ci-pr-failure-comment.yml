@@ -1,0 +1,64 @@
+# ci-pr-failure-comment.yml v1
+name: PR comment on CI(PR) failure
+
+on:
+  workflow_run:
+    workflows: ["CI (PR)"]
+    types: [completed]
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+
+jobs:
+  comment:
+    # Only comment when CI (PR) failed
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Find PR and comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const run = context.payload.workflow_run;
+            const headSha = run.head_sha;
+
+            // Find PR(s) associated with this commit SHA
+            const prs = await github.paginate(
+              github.rest.pulls.list,
+              { owner, repo, state: "open", per_page: 100 }
+            );
+
+            const matched = prs.filter(pr => pr.head && pr.head.sha === headSha);
+
+            if (matched.length === 0) {
+              core.info(`No open PR found for SHA ${headSha}. Skipping.`);
+              return;
+            }
+
+            const pr = matched[0];
+            const runUrl = run.html_url;
+
+            const body =
+              `🚨 **CI (PR) failed** for this PR.\n\n` +
+              `- Run: ${runUrl}\n` +
+              `- Commit: \`${headSha}\`\n\n` +
+              `**What to do next**\n` +
+              `1) Open the run link above → check the failing step\n` +
+              `2) If Playwright failed, download artifacts: **playwright-report**, **test-results**, **server-log**\n` +
+              `3) Re-push a fix commit to re-run CI\n\n` +
+              `Tip: the job **Summary** already includes MODE/STRICT settings and local commands.`;
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: pr.number,
+              body
+            });
+
+            core.info(`Commented on PR #${pr.number}`);
