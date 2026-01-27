@@ -68,7 +68,7 @@ body {
     left: 0;
     height: 100vh;
     overflow-y: auto;
-    z-index: 500;
+    z-index: 2000;
     transition: transform 0.3s;
 }
 
@@ -138,7 +138,7 @@ body {
 .topbar {
     position: sticky;
     top: 0;
-    z-index: 150;
+    z-index: 100;
     display: grid;
     grid-template-columns: 60px 1fr auto;
     align-items: center;

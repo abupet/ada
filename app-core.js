@@ -106,6 +106,7 @@ async function initApp() {
     initChunkingSectionToggle();
     initVetNameSetting();
     initClinicLogoSetting();
+    applyVersionInfo();
     await initSpeakersDB();
     await initMultiPetSystem(); // Initialize multi-pet system
 
@@ -123,6 +124,13 @@ async function initApp() {
     updateHistoryBadge();
     updateCostDisplay();
     restoreLastPage(); // Restore last viewed page
+}
+
+function applyVersionInfo() {
+    const versionEl = document.getElementById('appVersion');
+    const releaseNotesEl = document.getElementById('appReleaseNotesVersion');
+    if (versionEl) versionEl.textContent = ADA_VERSION;
+    if (releaseNotesEl) releaseNotesEl.textContent = ADA_VERSION;
 }
 
 function initNavigation() {
