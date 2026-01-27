@@ -68,7 +68,7 @@ body {
     left: 0;
     height: 100vh;
     overflow-y: auto;
-    z-index: 100;
+    z-index: 500;
     transition: transform 0.3s;
 }
 
@@ -156,6 +156,23 @@ body {
 .topbar-logo {
     height: 34px;
     width: auto;
+}
+
+.clinic-logo-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.clinic-logo-preview {
+    width: 180px;
+    max-width: 100%;
+    height: 60px;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    padding: 6px 10px;
 }
 
 /* Page Header with Logo */

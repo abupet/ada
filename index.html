@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ADA v6.17.5 - AI Driven Abupet</title>
+    <title>ADA</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -14,7 +14,7 @@
     <div id="loginScreen" class="login-screen">
         <div class="login-card">
             <img src="logo-abupet.png" alt="ADA Logo" class="login-logo">
-            <h1>ADA v6.17.4</h1>
+            <h1>ADA v<span data-ada-version></span></h1>
             <p>AI Driven Abupet</p>
             <input type="password" id="passwordInput" placeholder="Password" onkeypress="if(event.key==='Enter')login()">
             <button class="btn btn-primary" onclick="login()" data-testid="login-button">Accedi</button>
@@ -65,7 +65,7 @@
                     <div class="selected-pet-header" data-selected-pet-header></div>
                 </div>
                 <div class="topbar-right">
-                    <img src="logo-anicura.png" alt="AniCura" class="topbar-logo">
+                    <img id="clinicLogo" src="logo-anicura.png" alt="Logo clinica" class="topbar-logo" data-testid="clinic-logo">
                 </div>
             </div>
             
@@ -844,6 +844,31 @@
 
                 </div>
                 <div class="card">
+                    <h3>Informazioni clinica</h3>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label>Nome veterinario</label>
+                        <input type="text" id="vetNameInput" placeholder="Es: Dott. Rossi" oninput="saveVetName(this.value)">
+                        <p style="font-size: 12px; color: #888; margin-top: 5px;">Usato in export e, dove previsto, nelle comunicazioni al proprietario</p>
+                    </div>
+                    <button class="section-toggle" onclick="toggleClinicLogoSection()" data-testid="toggle-clinic-logo-section-button">
+                        <span>🏥 Logo clinica</span>
+                        <span id="clinicLogoToggleIcon" class="toggle-icon">▸</span>
+                    </button>
+                    <div id="clinicLogoSectionBody" style="display:none;" data-testid="clinic-logo-section-body">
+                        <p style="color:#666;font-size:13px;margin-bottom:10px;">
+                            Carica il logo che comparirà nell'intestazione delle pagine e nei PDF esportati.
+                        </p>
+                        <div class="clinic-logo-upload">
+                            <img id="clinicLogoPreview" src="logo-anicura.png" alt="Logo clinica" class="clinic-logo-preview" data-testid="clinic-logo-preview">
+                            <div class="button-row">
+                                <label class="btn btn-secondary" data-testid="clinic-logo-upload-button">
+                                    📤 Carica logo
+                                    <input type="file" id="clinicLogoInput" accept="image/*" style="display:none;" data-testid="clinic-logo-input">
+                                </label>
+                                <button class="btn btn-secondary" onclick="resetClinicLogo()" data-testid="reset-clinic-logo-button">↩️ Ripristina</button>
+                            </div>
+                        </div>
+                    </div>
                     <button class="section-toggle" onclick="toggleSpeakersSection()" data-testid="toggle-speakers-section-button">
                         <span>🎤 Parlanti (Reference Clips)</span>
                         <span id="speakersToggleIcon" class="toggle-icon">▸</span>
@@ -860,79 +885,9 @@
                     </button>
                     </div>
                 </div>
-                
-                <div class="card">
-                    <h3>Registrazione a chunk (robusta)</h3>
-                    <p style="color:#666;font-size:13px;margin-bottom:10px;">
-                        Default consigliati: Windows 20 min • Android 15 min • iPhone 10 min. Il profilo viene scelto automaticamente e mostrato qui.
-                    </p>
-
-                    <div class="form-group" style="margin-bottom: 12px;">
-                        <label style="display:flex;align-items:center;gap:10px;">
-                            <input type="checkbox" id="chunkingEnabled" onchange="toggleChunkingEnabled(this.checked)">
-                            <span>Abilita registrazione a chunk (consigliata)</span>
-                        </label>
-                    </div>
-
-                    <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <div class="form-group">
-                            <label>Profilo in uso (auto)</label>
-                            <input type="text" id="chunkingProfile" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>mimeType attivo (auto)</label>
-                            <input type="text" id="chunkingMimeType" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>chunkDurationSec</label>
-                            <input type="number" id="chunkDurationSec" min="60" step="10">
-                        </div>
-                        <div class="form-group">
-                            <label>timesliceMs</label>
-                            <input type="number" id="timesliceMs" min="250" step="50">
-                        </div>
-                        <div class="form-group">
-                            <label>maxPendingChunks</label>
-                            <input type="number" id="maxPendingChunks" min="1" step="1">
-                        </div>
-                        <div class="form-group">
-                            <label>maxConcurrentTranscriptions</label>
-                            <input type="number" id="maxConcurrentTranscriptions" min="1" step="1">
-                        </div>
-                        <div class="form-group">
-                            <label>uploadRetryCount</label>
-                            <input type="number" id="uploadRetryCount" min="0" step="1">
-                        </div>
-                        <div class="form-group">
-                            <label>uploadRetryBackoffMs</label>
-                            <input type="number" id="uploadRetryBackoffMs" min="200" step="100">
-                        </div>
-                        <div class="form-group">
-                            <label>hardStopAtMb</label>
-                            <input type="number" id="hardStopAtMb" min="1" step="1">
-                        </div>
-                        <div class="form-group">
-                            <label>warnBeforeSplitSec</label>
-                            <input type="number" id="warnBeforeSplitSec" min="0" step="1">
-                        </div>
-                        <div class="form-group full-width">
-                            <label>autoSplitGraceMs</label>
-                            <input type="number" id="autoSplitGraceMs" min="0" step="50">
-                        </div>
-                    </div>
-
-                </div>
 
                 <div class="card">
-                    <h3>Sistema</h3>
-
-                    <div class="form-group" style="margin-bottom: 15px;">
-                        <label>Nome veterinario</label>
-                        <input type="text" id="vetNameInput" placeholder="Es: Dott. Rossi" oninput="saveVetName(this.value)">
-                        <p style="font-size: 12px; color: #888; margin-top: 5px;">Usato in export e, dove previsto, nelle comunicazioni al proprietario</p>
-                    </div>
-                    <button class="btn btn-primary" style="width: 100%; margin-bottom: 15px;" onclick="openCostsPage()" data-testid="open-costs-button">💰 Consumo API</button>
-                    
+                    <h3>Informazioni di sistema</h3>
                     <div class="form-group" style="margin-bottom: 15px;">
                         <label style="display: flex; align-items: center; gap: 10px;">
                             <input type="checkbox" id="debugLogEnabled" onchange="toggleDebugLog(this.checked)" checked>
@@ -941,12 +896,9 @@
                         <p style="font-size: 12px; color: #888; margin-top: 5px;">Disattiva per migliorare le performance in produzione</p>
                     </div>
                     
-                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 15px;" onclick="exportLogFile()" data-testid="export-log-button">📄 Scarica Log Errori (ADA.log)</button>
-                    <button class="btn btn-secondary" style="width: 100%;" onclick="clearLog(); showToast('Log cancellato', 'success');" data-testid="clear-log-button">🗑️ Cancella Log Errori</button>
-                    
                     <h3 style="margin-top: 20px;">Informazioni</h3>
-                        <p><strong>Versione:</strong> ADA v6.17.4</p>
-                    <p><strong>Novità v6.17.3:</strong> Registrazione lunga a chunk con trascrizione in parallelo, profili automatici per dispositivo, UI runtime della coda, cache audio test e debug avanzato.</p>
+                        <p><strong>Versione:</strong> ADA v<span data-ada-version></span></p>
+                    <p><strong>Novità v<span data-ada-version></span>:</strong> <span data-ada-release-notes></span></p>
                 </div>
             </div>
 
@@ -954,6 +906,87 @@
             <div id="page-debug" class="page" style="display:none;">
                 <div class="page-header">
                     <h2>🛠 Debug</h2>
+                </div>
+                <div class="card">
+                    <button class="section-toggle" onclick="toggleChunkingSection()" data-testid="toggle-chunking-section-button">
+                        <span>🎚️ Registrazione a chunk (robusta)</span>
+                        <span id="chunkingToggleIcon" class="toggle-icon">▸</span>
+                    </button>
+                    <div id="chunkingSectionBody" style="display:none;" data-testid="chunking-section-body">
+                        <p style="color:#666;font-size:13px;margin-bottom:10px;">
+                            Default consigliati: Windows 20 min • Android 15 min • iPhone 10 min. Il profilo viene scelto automaticamente e mostrato qui.
+                        </p>
+
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label style="display:flex;align-items:center;gap:10px;">
+                                <input type="checkbox" id="chunkingEnabled" onchange="toggleChunkingEnabled(this.checked)" data-testid="chunking-enabled-toggle">
+                                <span>Abilita registrazione a chunk (consigliata)</span>
+                            </label>
+                        </div>
+
+                        <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div class="form-group">
+                                <label>Profilo in uso (auto)</label>
+                                <input type="text" id="chunkingProfile" readonly data-testid="chunking-profile">
+                            </div>
+                            <div class="form-group">
+                                <label>mimeType attivo (auto)</label>
+                                <input type="text" id="chunkingMimeType" readonly data-testid="chunking-mimetype">
+                            </div>
+                            <div class="form-group">
+                                <label>chunkDurationSec</label>
+                                <input type="number" id="chunkDurationSec" min="60" step="10" data-testid="chunk-duration-input">
+                            </div>
+                            <div class="form-group">
+                                <label>timesliceMs</label>
+                                <input type="number" id="timesliceMs" min="250" step="50" data-testid="chunk-timeslice-input">
+                            </div>
+                            <div class="form-group">
+                                <label>maxPendingChunks</label>
+                                <input type="number" id="maxPendingChunks" min="1" step="1" data-testid="chunk-max-pending-input">
+                            </div>
+                            <div class="form-group">
+                                <label>maxConcurrentTranscriptions</label>
+                                <input type="number" id="maxConcurrentTranscriptions" min="1" step="1" data-testid="chunk-max-concurrent-input">
+                            </div>
+                            <div class="form-group">
+                                <label>uploadRetryCount</label>
+                                <input type="number" id="uploadRetryCount" min="0" step="1" data-testid="chunk-retry-count-input">
+                            </div>
+                            <div class="form-group">
+                                <label>uploadRetryBackoffMs</label>
+                                <input type="number" id="uploadRetryBackoffMs" min="200" step="100" data-testid="chunk-retry-backoff-input">
+                            </div>
+                            <div class="form-group">
+                                <label>hardStopAtMb</label>
+                                <input type="number" id="hardStopAtMb" min="1" step="1" data-testid="chunk-hard-stop-input">
+                            </div>
+                            <div class="form-group">
+                                <label>warnBeforeSplitSec</label>
+                                <input type="number" id="warnBeforeSplitSec" min="0" step="1" data-testid="chunk-warn-before-input">
+                            </div>
+                            <div class="form-group full-width">
+                                <label>autoSplitGraceMs</label>
+                                <input type="number" id="autoSplitGraceMs" min="0" step="50" data-testid="chunk-split-grace-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>API Key</h3>
+                    <div class="form-group">
+                        <label>Chiave da usare</label>
+                        <select id="apiKeyModeSelector" data-testid="api-key-mode-selector">
+                            <option value="general">Generale</option>
+                            <option value="costs">Calcolo consumi</option>
+                        </select>
+                        <p style="font-size: 12px; color: #888; margin-top: 5px;">La scelta viene memorizzata e rimane attiva ai successivi accessi.</p>
+                    </div>
+                </div>
+                <div class="card" data-testid="debug-system-tools">
+                    <button class="btn btn-primary" style="width: 100%; margin-bottom: 15px;" onclick="openCostsPage()" data-testid="open-costs-button">💰 Consumo API</button>
+                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 15px;" onclick="exportLogFile()" data-testid="export-log-button">📄 Scarica Log Errori (ADA.log)</button>
+                    <button class="btn btn-secondary" style="width: 100%;" onclick="clearLog(); showToast('Log cancellato', 'success');" data-testid="clear-log-button">🗑️ Cancella Log Errori</button>
                 </div>
                 <div id="debugTestTools" class="card" style="display:none;">
                     <p style="margin: 0 0 10px; color: #666; font-size: 12px;">🧪 Strumenti di test (debug)</p>
