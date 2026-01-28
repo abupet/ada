@@ -1,4 +1,4 @@
-// ADA v6.17.5 - Configuration
+// ADA v6.17.8 - Configuration
 // API Keys are stored in api-keys.js
 
 let API_KEY = null;
@@ -29,7 +29,7 @@ function getSaltForMode(mode) {
 }
 
 // Version
-const ADA_VERSION = '6.17.5';
+const ADA_VERSION = '6.17.8';
 
 // Template titles
 const templateTitles = {
