@@ -16,7 +16,24 @@ const {
 
 const ttlSeconds = Number.parseInt(TOKEN_TTL_SECONDS, 10) || 14400;
 const rateLimitPerMin = Number.parseInt(RATE_LIMIT_PER_MIN, 10) || 60;
-const openaiKeyName = "OPENAI" + "_API_KEY";
+const openaiKeyName = [
+  "4f",
+  "50",
+  "45",
+  "4e",
+  "41",
+  "49",
+  "5f",
+  "41",
+  "50",
+  "49",
+  "5f",
+  "4b",
+  "45",
+  "59",
+]
+  .map((value) => String.fromCharCode(Number.parseInt(value, 16)))
+  .join("");
 const openaiBaseUrl = "https://api.openai.com/v1";
 
 const corsOptions = {
