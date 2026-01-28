@@ -13,8 +13,10 @@
     "test:regression": "playwright test --project=chromium",
     "test:deployed": "DEPLOYED=1 playwright test --project=chromium --grep @deployed",
     "test:policy": "node tests/policy/policy-checks.js",
-	"test:smoke:strict": "set STRICT_NETWORK=1&& set STRICT_ALLOW_HOSTS=cdnjs.cloudflare.com&& playwright test --project=chromium --grep @smoke"
-
+    "test:ci": "node scripts/ci/run-tests.js",
+    "test:ci:real": "node scripts/ci/run-tests.js --long",
+    "test:ci:long": "node scripts/ci/run-tests.js --long-only",
+    "test:smoke:strict": "set STRICT_NETWORK=1&& set STRICT_ALLOW_HOSTS=cdnjs.cloudflare.com&& playwright test --project=chromium --grep @smoke"
   },
   "repository": {
     "type": "git",
