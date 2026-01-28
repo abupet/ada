@@ -4,7 +4,7 @@ You are working on the ADA web application.
 This repository contains the FULL source code.
 
 CURRENT BASELINE
-- Latest stable version: ADA v6.17.5
+- Latest stable version: ADA v6.17.8
 - This version fixes a critical bug where app-recording.js was not executed
   (SyntaxError caused some buttons to not work on the "Visita" page).
 - This repository already includes the fixed app-recording.js.

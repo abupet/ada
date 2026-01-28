@@ -1,7 +1,7 @@
 # ADA – Manual Test Plan
 
 ## Baseline
-Version under test: v6.17.5+
+Version under test: v6.17.8+
 
 ---
 

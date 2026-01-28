@@ -1,5 +1,9 @@
 # Release Notes (cumulative)
 
+## v6.17.8 (2026-01-28)
+- Aggiornato il numero di versione visibile nell'app e nei tool di supporto.
+- Archiviato il file di specifica completata e ripristinato il template vuoto.
+
 ## v6.17.7 (2026-01-22)
 - **Fix**: aggiunta intestazione con versione in `specs/README.md`.
 - **Behavior**: nessuna modifica funzionale.
