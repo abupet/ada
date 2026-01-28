@@ -1942,9 +1942,9 @@ Rispondi SOLO con un JSON array. Per ogni segmento indica:
 Esempio: [{"segment_index": 0, "speaker": "Veterinario", "role": "veterinario", "confidence": 0.9}]`;
 
     try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetchBackend('/api/chat', {
             method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 model: 'gpt-4o-mini', // Cheaper model for this task
                 messages: [{ role: 'user', content: prompt }],

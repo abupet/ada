@@ -267,9 +267,9 @@ Scrivi un profilo sanitario professionale e sintetico.
 Se inserisci una firma, usa il nome veterinario "${vetName || '[Nome del Veterinario]'}" e la data "${generatedDate}".`;
 
     try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetchBackend('/api/chat', {
             method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ model: 'gpt-4o', messages: [{ role: 'user', content: prompt }], temperature: 0.5 })
         });
         if (!response.ok) {
@@ -360,9 +360,9 @@ let isRecordingQuestion = false;
 async function runQnaModerationCheck(text, kind) {
     const content = (text || '').toString().trim();
     if (!content) return false;
-    const response = await fetch('https://api.openai.com/v1/moderations', {
+    const response = await fetchBackend('/api/moderate', {
         method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: 'omni-moderation-latest', input: content })
     });
     if (!response.ok) {
@@ -475,9 +475,9 @@ Se NON correlata ad animali/pet: "Mi dispiace, posso rispondere solo a domande s
 Altrimenti rispondi in modo chiaro e rassicurante.`;
 
     try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetchBackend('/api/chat', {
             method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ model: 'gpt-4o', messages: [{ role: 'user', content: prompt }], temperature: 0.5 })
         });
         if (!response.ok) {
@@ -518,9 +518,9 @@ Diagnosi recente: ${_getMostRecentDiagnosisText()}
 Rispondi in JSON: {"faq": [{"question": "...", "answer": "..."}]}`;
 
     try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetchBackend('/api/chat', {
             method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ model: 'gpt-4o', messages: [{ role: 'user', content: prompt }], temperature: 0.6 })
         });
         if (!response.ok) {

@@ -22,6 +22,7 @@ let tipsData = [];
 let debugLogEnabled = true;
 let checklistLabelTranslations = {};
 let extraLabelTranslations = {};
+const ADA_BACKEND_TOKEN_KEY = 'ada_backend_token';
 
 // ============================================
 // JSON EXTRACTION HELPERS (robust parsing from model output)
@@ -55,6 +56,11 @@ async function login() {
 
     if (apiKey) {
         API_KEY = apiKey;
+        const backendOk = await loginToBackend(password);
+        if (!backendOk) {
+            document.getElementById('loginError').style.display = 'block';
+            return;
+        }
         const sessionKey = btoa(password + ':' + Date.now());
         localStorage.setItem('ada_session', sessionKey);
         document.getElementById('loginScreen').style.display = 'none';
@@ -76,6 +82,8 @@ async function checkSession() {
             const apiKey = await decryptApiKey(password, getApiKeyMode());
             if (apiKey) {
                 API_KEY = apiKey;
+                const backendOk = await loginToBackend(password);
+                if (!backendOk) return;
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('appContainer').classList.add('active');
                 loadData();
@@ -88,7 +96,66 @@ async function checkSession() {
 
 function logout() {
     localStorage.removeItem('ada_session');
+    clearBackendToken();
     location.reload();
+}
+
+function getBackendToken() {
+    try {
+        return sessionStorage.getItem(ADA_BACKEND_TOKEN_KEY);
+    } catch (e) {
+        return null;
+    }
+}
+
+function setBackendToken(token) {
+    try {
+        if (token) sessionStorage.setItem(ADA_BACKEND_TOKEN_KEY, token);
+    } catch (e) {}
+}
+
+function clearBackendToken() {
+    try {
+        sessionStorage.removeItem(ADA_BACKEND_TOKEN_KEY);
+    } catch (e) {}
+}
+
+async function loginToBackend(password) {
+    if (!API_BASE_URL) return true;
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+        });
+        if (!response.ok) {
+            return false;
+        }
+        const data = await response.json();
+        if (data?.token) {
+            setBackendToken(data.token);
+            return true;
+        }
+    } catch (e) {}
+    return false;
+}
+
+function handleBackendUnauthorized() {
+    clearBackendToken();
+    showToast('Sessione scaduta. Effettua di nuovo il login.', 'error');
+    logout();
+}
+
+async function fetchBackend(path, options = {}) {
+    const headers = new Headers(options.headers || {});
+    const token = getBackendToken();
+    if (token) headers.set('Authorization', `Bearer ${token}`);
+    const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
+    if (response.status === 401) {
+        handleBackendUnauthorized();
+        throw new Error('Unauthorized');
+    }
+    return response;
 }
 
 // ============================================
@@ -1282,9 +1349,9 @@ async function sendFullscreenCorrection() {
         const correctionText = transcribeResult.text;
         
         // Apply correction using GPT
-        const applyResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        const applyResponse = await fetchBackend('/api/chat', {
             method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 model: 'gpt-4o',
                 messages: [
@@ -1897,9 +1964,9 @@ function updateSOAPLabels(lang) {
 }
 
 async function translateText(text, targetLang) {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetchBackend('/api/chat', {
         method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             model: 'gpt-4o',
             messages: [{ role: 'user', content: `Traduci in ${langNames[targetLang]}. Rispondi SOLO con la traduzione:\n\n${text}` }],

@@ -3,6 +3,7 @@
 
 let API_KEY = null;
 const ADA_API_KEY_MODE_KEY = 'ada_api_key_mode';
+const API_BASE_URL = 'https://<service>.onrender.com';
 
 function getApiKeyMode() {
     try {
