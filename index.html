@@ -29,6 +29,7 @@
             <div class="sidebar-header">
                 <img src="logo-abupet.png" alt="ADA" class="sidebar-logo">
                 <span class="sidebar-title">ADA</span>
+                <button class="sidebar-close" onclick="toggleSidebar()" aria-label="Chiudi menu" data-testid="close-sidebar-button">×</button>
             </div>
             
             <nav class="sidebar-nav">
@@ -40,7 +41,7 @@
                 <div class="nav-item" data-page="patient">🐾 Dati Pet</div>
                 <div class="nav-item" data-page="photos">📷 Foto</div>
                 <div class="nav-item" data-page="vitals">📊 Parametri Vitali</div>
-                <div class="nav-item" data-page="diary">📔 Diario Clinico</div>
+                <div class="nav-item" data-page="diary">📔 Profilo sanitario</div>
                 <div class="nav-item" data-page="qna">❓ Domande & Risposte</div>
                 <div class="nav-item" data-page="history">📁 Archivio <span class="badge" id="historyBadge" data-testid="history-badge">0</span></div>
                 
@@ -652,7 +653,7 @@
             <!-- Page: Diary -->
             <div id="page-diary" class="page">
                 <div class="page-header">
-                    <h2>📔 Diario Clinico</h2>
+                    <h2>📔 Profilo sanitario</h2>
 
                 </div>
                 <div class="card">
@@ -667,8 +668,8 @@
                     <button id="btnSpeakDiary" class="btn btn-secondary" onclick="speakDiary()" style="margin-bottom: 10px;" data-testid="speak-diary-button">🔊 Leggi</button>
                     
                     <div class="textarea-wrapper">
-                        <textarea id="diaryText" rows="15" placeholder="Diario clinico del paziente..."></textarea>
-                        <button class="expand-btn" onclick="expandTextarea('diaryText', 'Diario Clinico')" data-testid="expand-diary-button">⛶</button>
+                        <textarea id="diaryText" rows="15" placeholder="Profilo sanitario del paziente..."></textarea>
+                        <button class="expand-btn" onclick="expandTextarea('diaryText', 'Profilo sanitario')" data-testid="expand-diary-button">⛶</button>
                     </div>
                     
                     <div class="button-row" style="margin-top: 15px;">
@@ -786,6 +787,7 @@
                 </div>
                 <div class="card">
                     <div id="historyList" class="history-list"></div>
+                    <p class="history-note">Nota: tieni premuto un referto per mostrare la “x” e cancellarlo.</p>
                 </div>
             </div>
 
@@ -862,42 +864,35 @@
                 </div>
                 
                 <div class="card">
-                    <h3>Logo clinica</h3>
-                    <p style="color:#666;font-size:13px;margin-bottom:10px;">
-                        Carica il logo che comparirà nell'intestazione delle pagine e nei PDF esportati.
-                    </p>
-                    <div class="clinic-logo-upload">
-                        <img id="clinicLogoPreview" src="logo-anicura.png" alt="Logo clinica" class="clinic-logo-preview" data-testid="clinic-logo-preview">
-                        <div class="button-row">
-                            <label class="btn btn-secondary" data-testid="clinic-logo-upload-button">
-                                📤 Carica logo
-                                <input type="file" id="clinicLogoInput" accept="image/*" style="display:none;" data-testid="clinic-logo-input">
-                            </label>
-                            <button class="btn btn-secondary" onclick="resetClinicLogo()" data-testid="reset-clinic-logo-button">↩️ Ripristina</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3>API Key</h3>
-                    <div class="form-group">
-                        <label>Chiave da usare</label>
-                        <select id="apiKeyModeSelector" data-testid="api-key-mode-selector">
-                            <option value="general">Generale</option>
-                            <option value="costs">Calcolo consumi</option>
-                        </select>
-                        <p style="font-size: 12px; color: #888; margin-top: 5px;">La scelta viene memorizzata e rimane attiva ai successivi accessi.</p>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3>Sistema</h3>
-
+                    <h3>Informazioni clinica</h3>
                     <div class="form-group" style="margin-bottom: 15px;">
                         <label>Nome veterinario</label>
                         <input type="text" id="vetNameInput" placeholder="Es: Dott. Rossi" oninput="saveVetName(this.value)">
                         <p style="font-size: 12px; color: #888; margin-top: 5px;">Usato in export e, dove previsto, nelle comunicazioni al proprietario</p>
                     </div>
+                    <button class="section-toggle" onclick="toggleClinicLogoSection()" data-testid="toggle-clinic-logo-section-button">
+                        <span>Logo clinica</span>
+                        <span id="clinicLogoToggleIcon" class="toggle-icon">▸</span>
+                    </button>
+                    <div id="clinicLogoSectionBody" style="display:none;">
+                        <p style="color:#666;font-size:13px;margin-bottom:10px;">
+                            Carica il logo che comparirà nell'intestazione delle pagine e nei PDF esportati.
+                        </p>
+                        <div class="clinic-logo-upload">
+                            <img id="clinicLogoPreview" src="logo-anicura.png" alt="Logo clinica" class="clinic-logo-preview" data-testid="clinic-logo-preview">
+                            <div class="button-row">
+                                <label class="btn btn-secondary" data-testid="clinic-logo-upload-button">
+                                    📤 Carica logo
+                                    <input type="file" id="clinicLogoInput" accept="image/*" style="display:none;" data-testid="clinic-logo-input">
+                                </label>
+                                <button class="btn btn-secondary" onclick="resetClinicLogo()" data-testid="reset-clinic-logo-button">↩️ Ripristina</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Sistema</h3>
                     <div class="form-group" style="margin-bottom: 15px;">
                         <label style="display: flex; align-items: center; gap: 10px;">
                             <input type="checkbox" id="debugLogEnabled" onchange="toggleDebugLog(this.checked)" checked>
@@ -980,6 +975,17 @@
                                 <input type="number" id="autoSplitGraceMs" min="0" step="50" data-testid="chunk-split-grace-input">
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>API Key</h3>
+                    <div class="form-group">
+                        <label>Chiave da usare</label>
+                        <select id="apiKeyModeSelector" data-testid="api-key-mode-selector">
+                            <option value="general">Generale</option>
+                            <option value="costs">Calcolo consumi</option>
+                        </select>
+                        <p style="font-size: 12px; color: #888; margin-top: 5px;">La scelta viene memorizzata e rimane attiva ai successivi accessi.</p>
                     </div>
                 </div>
                 <div class="card" data-testid="debug-system-tools">

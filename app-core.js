@@ -20,6 +20,8 @@ let fullscreenTargetId = null;
 let lastResetDate = null;
 let tipsData = [];
 let debugLogEnabled = true;
+let checklistLabelTranslations = {};
+let extraLabelTranslations = {};
 
 // ============================================
 // JSON EXTRACTION HELPERS (robust parsing from model output)
@@ -107,12 +109,14 @@ async function initApp() {
     initChunkingSectionToggle();
     initVetNameSetting();
     initClinicLogoSetting();
+    restoreClinicLogoSectionState();
     applyVersionInfo();
     await initSpeakersDB();
     await initMultiPetSystem(); // Initialize multi-pet system
 
     // Restore any draft content (transcription/SOAP/notes) saved when the tab lost focus
     restoreTextDrafts();
+    syncLangSelectorsForCurrentDoc();
 
     // Restore progressive transcription state for chunking sessions (if any)
     try { if (typeof restoreChunkVisitDraft === 'function') await restoreChunkVisitDraft(); } catch (e) {}
@@ -180,6 +184,7 @@ function navigateToPage(page) {
         try { if (typeof restoreTipsDataForCurrentPet === 'function') restoreTipsDataForCurrentPet(); } catch(e) {}
         try { if (typeof updateTipsMeta === 'function') updateTipsMeta(); } catch(e) {}
     }
+    syncLangSelectorsForCurrentDoc();
 }
 
 function saveCurrentPageState() {
@@ -695,6 +700,29 @@ function initClinicLogoSetting() {
     if (input) input.addEventListener('change', handleClinicLogoUpload);
 }
 
+const ADA_CLINIC_LOGO_SECTION_KEY = 'ada_clinic_logo_section_open';
+
+function toggleClinicLogoSection(forceOpen) {
+    const body = document.getElementById('clinicLogoSectionBody');
+    const icon = document.getElementById('clinicLogoToggleIcon');
+    if (!body) return;
+    const isOpen = typeof forceOpen === 'boolean'
+        ? forceOpen
+        : (body.style.display === 'none' || body.style.display === '');
+    body.style.display = isOpen ? '' : 'none';
+    if (icon) icon.textContent = isOpen ? '▾' : '▸';
+    try { localStorage.setItem(ADA_CLINIC_LOGO_SECTION_KEY, isOpen ? 'true' : 'false'); } catch (e) {}
+}
+
+function restoreClinicLogoSectionState() {
+    let open = true;
+    try {
+        const stored = localStorage.getItem(ADA_CLINIC_LOGO_SECTION_KEY);
+        if (stored !== null) open = stored !== 'false';
+    } catch (e) {}
+    toggleClinicLogoSection(open);
+}
+
 // ============================================
 // CHUNK RECORDING SETTINGS (v6.17.3)
 // ============================================
@@ -829,10 +857,12 @@ function updateDebugToolsVisibility() {
     const el2 = document.getElementById('audioCacheTools');
     const nav = document.getElementById('nav-debug');
     const page = document.getElementById('page-debug');
+    const runtime = document.getElementById('chunkingRuntime');
     if (el1) el1.style.display = dbg ? '' : 'none';
     if (el2) el2.style.display = dbg ? '' : 'none';
     if (nav) nav.style.display = dbg ? '' : 'none';
     if (page) page.style.display = dbg ? '' : 'none';
+    if (!dbg && runtime) runtime.style.display = 'none';
 
     if (!dbg) {
         const activePage = document.querySelector('.page.active');
@@ -972,7 +1002,8 @@ function renderTemplateExtras() {
     container.innerHTML = cfg.extraFields.map(f => {
         const key = (f.key || '').toString();
         const id = `extra_${key}`;
-        const label = (f.label || key).toString();
+        const rawLabel = (f.label || key).toString();
+        const label = getTemplateLabelTranslation('extras', key, rawLabel);
         const hint = (f.hint || '').toString();
         const value = ((currentTemplateExtras && currentTemplateExtras[key]) ? currentTemplateExtras[key] : '').toString();
 
@@ -1105,7 +1136,8 @@ function renderChecklistInSOAP() {
     // Build DOM with data-key to avoid inline onclick quote issues
     grid.innerHTML = items.map(it => {
         const key = String(it.key ?? '').trim();
-        const label = _escapeHtml(it.label || key);
+        const rawLabel = (it.label || key).toString();
+        const label = _escapeHtml(getTemplateLabelTranslation('checklist', key, rawLabel));
         const val = st[key];
         const cls = val === true ? 'checked' : (val === false ? 'unchecked' : '');
         const badge = val === true ? '✓' : (val === false ? '✗' : '•');
@@ -1687,17 +1719,128 @@ function loadApiUsage() {
 // LANGUAGE SELECTORS
 // ============================================
 
+const ADA_LANG_STATE_PREFIX = 'ada_lang_state_';
+
+function _getLangStateKey(selectorId) {
+    if (selectorId === 'diaryLangSelector') {
+        return `${ADA_LANG_STATE_PREFIX}${selectorId}`;
+    }
+    const docId = currentEditingHistoryId || 'draft';
+    return `${ADA_LANG_STATE_PREFIX}${selectorId}_${docId}`;
+}
+
+function getStoredLangForSelector(selectorId) {
+    try {
+        return localStorage.getItem(_getLangStateKey(selectorId)) || 'IT';
+    } catch (e) {
+        return 'IT';
+    }
+}
+
+function storeLangForSelector(selectorId, lang) {
+    try {
+        localStorage.setItem(_getLangStateKey(selectorId), lang);
+    } catch (e) {}
+}
+
+function setActiveLangButton(selectorId, lang) {
+    const selector = document.getElementById(selectorId);
+    if (!selector) return;
+    selector.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+}
+
+function syncLangSelectorsForCurrentDoc() {
+    const soapLang = getStoredLangForSelector('soapLangSelector');
+    setActiveLangButton('soapLangSelector', soapLang);
+    try { updateSOAPLabels(soapLang); } catch (e) {}
+    setActiveLangButton('ownerLangSelector', getStoredLangForSelector('ownerLangSelector'));
+    setActiveLangButton('diaryLangSelector', getStoredLangForSelector('diaryLangSelector'));
+}
+
+function _getTemplateTranslationStore(store, lang) {
+    const tpl = (currentTemplate || 'generale').toString();
+    if (!store[tpl]) store[tpl] = {};
+    if (!store[tpl][lang]) store[tpl][lang] = {};
+    return store[tpl][lang];
+}
+
+function getTemplateLabelTranslation(kind, key, fallback) {
+    const lang = getStoredLangForSelector('soapLangSelector');
+    if (lang === 'IT') return fallback;
+    const store = kind === 'extras' ? extraLabelTranslations : checklistLabelTranslations;
+    const tpl = (currentTemplate || 'generale').toString();
+    const translated = store?.[tpl]?.[lang]?.[key];
+    return translated || fallback;
+}
+
+async function translateExtrasValues(lang) {
+    const container = document.getElementById('extrasFields');
+    if (!container) return;
+    const fields = Array.from(container.querySelectorAll('[data-extra-field]'));
+    for (const field of fields) {
+        const key = field.getAttribute('data-extra-field');
+        const ta = field.querySelector('textarea');
+        const value = (ta?.value || '').trim();
+        if (!key || !value) continue;
+        const translated = await translateText(value, lang);
+        if (ta) ta.value = translated;
+        if (currentTemplateExtras && typeof currentTemplateExtras === 'object') {
+            currentTemplateExtras[key] = translated;
+        }
+    }
+    try { scheduleTemplateDraftSave(); } catch (e) {}
+    try { applyHideEmptyVisibility(); } catch (e) {}
+}
+
+async function translateTemplateLabels(lang) {
+    const cfg = _getTemplateConfigSafe();
+    if (!cfg) return;
+
+    if (lang === 'IT') {
+        const tpl = (currentTemplate || 'generale').toString();
+        if (extraLabelTranslations[tpl]) delete extraLabelTranslations[tpl][lang];
+        if (checklistLabelTranslations[tpl]) delete checklistLabelTranslations[tpl][lang];
+        try { renderTemplateExtras(); } catch (e) {}
+        try { renderChecklistInSOAP(); } catch (e) {}
+        return;
+    }
+
+    const extras = Array.isArray(cfg.extraFields) ? cfg.extraFields : [];
+    const checklistItems = Array.isArray(cfg.checklistItems) ? cfg.checklistItems : [];
+    const extrasStore = _getTemplateTranslationStore(extraLabelTranslations, lang);
+    const checklistStore = _getTemplateTranslationStore(checklistLabelTranslations, lang);
+
+    for (const f of extras) {
+        const key = (f.key || '').toString();
+        if (!key || extrasStore[key]) continue;
+        const label = (f.label || key).toString();
+        extrasStore[key] = await translateText(label, lang);
+    }
+
+    for (const it of checklistItems) {
+        const key = (it.key || '').toString();
+        if (!key || checklistStore[key]) continue;
+        const label = (it.label || key).toString();
+        checklistStore[key] = await translateText(label, lang);
+    }
+
+    try { renderTemplateExtras(); } catch (e) {}
+    try { renderChecklistInSOAP(); } catch (e) {}
+}
+
 function initLanguageSelectors() {
     document.querySelectorAll('.lang-selector').forEach(selector => {
         selector.querySelectorAll('.lang-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
-                const wasActive = btn.classList.contains('active');
-                selector.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                if (wasActive) return;
-                
                 const lang = btn.dataset.lang;
                 const selectorId = selector.id;
+                const currentLang = getStoredLangForSelector(selectorId);
+                if (lang === currentLang) return;
+
+                setActiveLangButton(selectorId, lang);
+                storeLangForSelector(selectorId, lang);
                 
                 showProgress(true);
                 try {
@@ -1710,6 +1853,8 @@ function initLanguageSelectors() {
                             const field = document.getElementById(fieldId);
                             if (field && field.value.trim()) field.value = await translateText(field.value, lang);
                         }
+                        await translateExtrasValues(lang);
+                        await translateTemplateLabels(lang);
                     } else if (selectorId === 'ownerLangSelector') {
                         const field = document.getElementById('ownerExplanation');
                         if (field && field.value.trim()) field.value = await translateText(field.value, lang);
@@ -1772,6 +1917,9 @@ function resetSoapDraftLink() {
   currentSOAPChecklist = {};
   try { renderTemplateExtras && renderTemplateExtras(); } catch(e) {}
   try { renderChecklistInSOAP && renderChecklistInSOAP(); } catch(e) {}
+  storeLangForSelector('soapLangSelector', 'IT');
+  storeLangForSelector('ownerLangSelector', 'IT');
+  syncLangSelectorsForCurrentDoc();
 
 }
 
@@ -1956,6 +2104,7 @@ async function openOrGenerateOwnerFromSelectedReport() {
     currentTemplate = _getTemplateKeyFromRecord(item);
     currentEditingSOAPIndex = index;
     currentEditingHistoryId = id;
+    syncLangSelectorsForCurrentDoc();
 
     currentTemplateExtras = item.extras || {};
     currentSOAPChecklist = item.checklist || {};
@@ -2080,6 +2229,7 @@ function loadHistoryById(id) {
     currentTemplate = _getTemplateKeyFromRecord(item);
     currentEditingSOAPIndex = index; // keep for compatibility
     currentEditingHistoryId = id;
+    syncLangSelectorsForCurrentDoc();
 
     
   // v6.16.3: restore per-report specialist extras

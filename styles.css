@@ -83,6 +83,18 @@ body {
 
 .sidebar-logo { width: 45px; height: 45px; border-radius: 8px; }
 .sidebar-title { font-size: 24px; font-weight: bold; }
+.sidebar-close {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+.sidebar-close:hover { background: rgba(255,255,255,0.15); }
 
 .sidebar-nav { padding: 15px 0; }
 .nav-section {
@@ -111,6 +123,13 @@ body {
     border-radius: 10px;
     font-size: 12px;
     margin-left: auto;
+}
+
+.history-note {
+    margin-top: 12px;
+    font-size: 12px;
+    color: #666;
+    text-align: center;
 }
 
 /* Main Content */

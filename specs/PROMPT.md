@@ -1,4 +1,3 @@
-
 Regola valida anche per le nuove versioni: ogni volta che fai un cambio funzionale oppure correggi un bug, valuta se ha senso inserirlo nei test automatici e, in questo caso, aggiorna i test "giusti" (smoke, regressione, end2end etc).  
 
 Quando si apre la sidebar, dammi un modo per chiuderla senza selezionare una voce di menu.

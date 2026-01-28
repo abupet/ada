@@ -306,6 +306,8 @@ async function runAudioAutoPipeline() {
             }
         } catch (e) {}
 
+        const statusEl = document.getElementById('recordingStatus');
+        if (statusEl) statusEl.textContent = 'Sto trascrivendo la registrazione.';
         await transcribeAudio();
 
         // If canceled during transcription, stop here
@@ -319,7 +321,6 @@ async function runAudioAutoPipeline() {
         if (!ok) {
             if (btnGenerateRow) btnGenerateRow.style.display = 'flex';
             if (titleEl) titleEl.textContent = 'Testo trascritto (audio corto: genera referto manualmente)';
-            const statusEl = document.getElementById('recordingStatus');
             if (statusEl) statusEl.textContent = '✅ Trascrizione pronta — premi “Genera referto”';
             showToast('Trascrizione pronta. Audio corto: genera il referto manualmente.', 'success');
             return;
@@ -327,8 +328,7 @@ async function runAudioAutoPipeline() {
 
         // Auto-generate SOAP
         if (btnGenerateRow) btnGenerateRow.style.display = 'none';
-        const statusEl = document.getElementById('recordingStatus');
-        if (statusEl) statusEl.textContent = '⏳ Generazione referto...';
+        if (statusEl) statusEl.textContent = 'Ho completato la trascrizione della registrazione. Sto generando il referto.';
 
         if (typeof generateSOAP === 'function') {
             await generateSOAP({ auto: true, signal: getVisitSignal() });
@@ -339,8 +339,7 @@ async function runAudioAutoPipeline() {
         if (titleEl) titleEl.textContent = '✅ Referto completato';
         if (btnAutoRow) btnAutoRow.style.display = 'flex';
 
-        // UI returns to ready state
-        if (statusEl) statusEl.textContent = 'Premi per registrare';
+        if (statusEl) statusEl.textContent = 'Ho completato la generazione del referto';
         showToast('✅ Referto completato', 'success');
 
     } catch (error) {
@@ -534,6 +533,7 @@ function updateChunkingBadgesFromSettings() {
 }
 
 function showChunkingRuntime() {
+    if (typeof debugLogEnabled !== 'undefined' && !debugLogEnabled) return;
     const wrap = document.getElementById('chunkingRuntime');
     if (wrap) wrap.style.display = '';
     updateChunkingBadgesFromSettings();
@@ -823,7 +823,7 @@ async function waitForChunkQueueToDrain({ force = false } = {}) {
         } catch (e) {}
 
         updateChunkingRuntimeUI();
-        if (statusEl) statusEl.textContent = `⏳ Trascrizione in corso... (coda ${chunkQueue.length}, inFlight ${chunkInFlight})`;
+        if (statusEl) statusEl.textContent = 'Sto trascrivendo la registrazione.';
         await _delay(450);
 
         if (chunkNextAppendIndex !== lastAppendIdx) {
@@ -836,11 +836,27 @@ async function waitForChunkQueueToDrain({ force = false } = {}) {
     }
 
     showProgress(false);
-    if (statusEl) statusEl.textContent = '✅ Trascrizione completa — puoi generare il referto';
 
-    // Enable manual SOAP generation
+    const transcriptionText = (document.getElementById('transcriptionText')?.value || '').toString();
+    const ok = transcriptionPassesQualityGate(transcriptionText);
     const btnGenerateRow = document.getElementById('generateSoapRow');
-    if (btnGenerateRow) btnGenerateRow.style.display = 'flex';
+
+    if (!ok) {
+        if (statusEl) statusEl.textContent = '✅ Trascrizione pronta — premi “Genera referto”';
+        if (btnGenerateRow) btnGenerateRow.style.display = 'flex';
+    } else {
+        if (btnGenerateRow) btnGenerateRow.style.display = 'none';
+        if (statusEl) statusEl.textContent = 'Ho completato la trascrizione della registrazione. Sto generando il referto.';
+        if (typeof generateSOAP === 'function') {
+            try {
+                await generateSOAP({ auto: true, signal: getVisitSignal() });
+                if (statusEl) statusEl.textContent = 'Ho completato la generazione del referto';
+            } catch (e) {
+                if (statusEl) statusEl.textContent = '❌ Errore generazione';
+                if (btnGenerateRow) btnGenerateRow.style.display = 'flex';
+            }
+        }
+    }
 
     // Reset UI state
     const rb = document.getElementById('recordBtn');
@@ -1536,7 +1552,7 @@ async function transcribeAudio() {
     const recordedMinutes = seconds > 0 ? seconds / 60 : 1;
     
     // Try diarized transcription first
-    document.getElementById('recordingStatus').textContent = '⏳ Trascrizione con riconoscimento parlanti...';
+    document.getElementById('recordingStatus').textContent = 'Sto trascrivendo la registrazione.';
     
     try {
         const result = await transcribeDiarizedOpenAI(audioBlob, 1); // attempt 1
@@ -1554,7 +1570,6 @@ async function transcribeAudio() {
             document.getElementById('transcriptionText').value = displayText;
         }
         const dt = ((performance.now() - t0) / 1000).toFixed(1);
-        document.getElementById('recordingStatus').textContent = `✅ Trascrizione completata in ${dt}s — ora puoi generare il referto`;
 
         if (typeof trackTranscriptionMinutes === 'function') trackTranscriptionMinutes(recordedMinutes, 'gpt4o');
         else {
@@ -1573,7 +1588,7 @@ async function transcribeAudio() {
         logError("TRASCRIZIONE", `Tentativo 1 fallito - ${error.message}`);
         
         // Retry once
-        document.getElementById('recordingStatus').textContent = '⏳ Retry trascrizione...';
+        document.getElementById('recordingStatus').textContent = 'Sto trascrivendo la registrazione.';
         
         try {
             const result = await transcribeDiarizedOpenAI(audioBlob, 2); // attempt 2
@@ -1590,7 +1605,6 @@ async function transcribeAudio() {
                 document.getElementById('transcriptionText').value = displayText;
             }
             const dt = ((performance.now() - t0) / 1000).toFixed(1);
-            document.getElementById('recordingStatus').textContent = `✅ Trascrizione completata in ${dt}s — ora puoi generare il referto`;
 
             if (typeof trackTranscriptionMinutes === 'function') trackTranscriptionMinutes(recordedMinutes, 'gpt4o');
             showToast(`✅ Trascrizione completata al secondo tentativo (${dt}s)`, 'success');
@@ -2031,7 +2045,7 @@ function formatTimeShort(seconds) {
 
 // Whisper fallback (no diarization) - but WITH segments/timestamps
 async function transcribeWithWhisperFallback(recordedMinutes) {
-    document.getElementById('recordingStatus').textContent = '⏳ Fallback Whisper...';
+    document.getElementById('recordingStatus').textContent = 'Sto trascrivendo la registrazione.';
 
     const t0 = performance.now();
 
@@ -2097,7 +2111,7 @@ async function transcribeWithWhisperFallback(recordedMinutes) {
             document.getElementById('transcriptionText').value = displayText;
         }
         const dt = ((performance.now() - t0) / 1000).toFixed(1);
-        document.getElementById('recordingStatus').textContent = `⚠️ Trascrizione Whisper completata in ${dt}s — ora puoi generare il referto`;
+        document.getElementById('recordingStatus').textContent = 'Sto trascrivendo la registrazione.';
 
         // Use actual duration when available
         const minutes = (result.duration ? (result.duration / 60) : recordedMinutes);

@@ -213,7 +213,11 @@ async function generateSOAP(options = {}) {
 
     showProgress(true);
     const statusEl = document.getElementById('recordingStatus');
-    if (statusEl) statusEl.textContent = '⏳ Generazione SOAP...';
+    if (statusEl) {
+        statusEl.textContent = auto
+            ? 'Ho completato la trascrizione della registrazione. Sto generando il referto.'
+            : '⏳ Generazione SOAP...';
+    }
 
     try {
         const soapResult = await generateSOAPStructured(transcriptionText, { signal });
@@ -248,8 +252,10 @@ async function generateSOAP(options = {}) {
             console.warn('8B extractor failed:', e);
         }
 
-        // Navigate to SOAP page only for manual generation
-        if (!auto && typeof navigateToPage === 'function') navigateToPage('soap');
+        if (auto && statusEl) statusEl.textContent = 'Ho completato la generazione del referto';
+
+        // Navigate to SOAP page when generation completes
+        if (typeof navigateToPage === 'function') navigateToPage('soap');
 
         const dt = ((performance.now() - t0) / 1000).toFixed(1);
         showToast(`Referto SOAP generato in ${dt} s`, 'success');
@@ -854,6 +860,7 @@ NON inventare, NON completare con conoscenza clinica, NON dedurre.
 
 Regole:
 - Per ogni extra (stringa): se nel testo NON c'è evidenza, restituisci stringa vuota "".
+- Se una informazione è già presente nel SOAP, NON ripeterla negli extra: lascia la stringa vuota.
 - Per ogni checklist item: 
   - true SOLO se nel testo è chiaramente indicato che è stato eseguito/rilevato.
   - false SOLO se nel testo è chiaramente indicato che NON è stato eseguito/è negativo.
@@ -909,6 +916,22 @@ ${soapPreview}
     const result = JSON.parse(content);
     const extrasOut = (result && result.extras && typeof result.extras === 'object') ? result.extras : {};
     const checklistOut = (result && result.checklist && typeof result.checklist === 'object') ? result.checklist : {};
+
+    const normalizeText = (value) => String(value || '')
+        .toLowerCase()
+        .replace(/[\s\W_]+/g, ' ')
+        .trim();
+    const soapCombined = normalizeText(
+        `${soapResult?.S || soapResult?.s || ''} ${soapResult?.O || soapResult?.o || ''} ${soapResult?.A || soapResult?.a || ''} ${soapResult?.P || soapResult?.p || ''}`
+    );
+    Object.keys(extrasOut || {}).forEach(key => {
+        const raw = (extrasOut[key] || '').toString().trim();
+        const norm = normalizeText(raw);
+        if (!raw || norm.length < 8) return;
+        if (soapCombined.includes(norm)) {
+            extrasOut[key] = '';
+        }
+    });
 
     // Push into UI state
     if (typeof setTemplateExtractionResult === 'function') {
@@ -1318,7 +1341,10 @@ Scrivi la spiegazione per il proprietario:`;
         if (data.error) throw new Error(data.error.message);
 
         const explanation = data.choices?.[0]?.message?.content || '';
-        document.getElementById('ownerExplanation').value = explanation;
+        const shouldUpdateUi = !opts.saveToHistoryId || !currentEditingHistoryId || opts.saveToHistoryId === currentEditingHistoryId;
+        if (shouldUpdateUi) {
+            document.getElementById('ownerExplanation').value = explanation;
+        }
 
         // Track usage (prefer real token counts)
         trackChatUsageOrEstimate('gpt-4o', prompt, explanation, data.usage);
@@ -1336,14 +1362,18 @@ Scrivi la spiegazione per il proprietario:`;
             } catch (e) {}
         }
 
-        // Generate glossary (tracked inside)
-        await generateGlossary((soap.a || '') + ' ' + (soap.p || ''));
+        if (shouldUpdateUi) {
+            // Generate glossary (tracked inside)
+            await generateGlossary((soap.a || '') + ' ' + (soap.p || ''));
 
-        const shouldNavigate = (typeof opts.navigate === 'boolean') ? opts.navigate : true;
-        if (shouldNavigate && typeof navigateToPage === 'function') navigateToPage('owner');
+            const shouldNavigate = (typeof opts.navigate === 'boolean') ? opts.navigate : true;
+            if (shouldNavigate && typeof navigateToPage === 'function') navigateToPage('owner');
+        }
 
         const dt = ((performance.now() - t0) / 1000).toFixed(1);
-        showToast(`Spiegazione generata in ${dt} s`, 'success');
+        if (shouldUpdateUi) {
+            showToast(`Spiegazione generata in ${dt} s`, 'success');
+        }
 
     } catch (e) {
         showToast('Errore: ' + e.message, 'error');
@@ -1663,6 +1693,8 @@ async function sendCorrection() {
                 a: document.getElementById('soap-a').value,
                 p: document.getElementById('soap-p').value
             };
+            const extrasObj = (typeof currentTemplateExtras === 'object' && currentTemplateExtras) ? currentTemplateExtras : {};
+            const checklistObj = (typeof currentSOAPChecklist === 'object' && currentSOAPChecklist) ? currentSOAPChecklist : {};
 
             const prompt = `Applica questa correzione vocale al referto SOAP.
 Correzione richiesta: "${correctionText}"
@@ -1673,7 +1705,13 @@ O: ${currentSOAP.o}
 A: ${currentSOAP.a}
 P: ${currentSOAP.p}
 
-Restituisci il referto corretto in JSON: {"S": "...", "O": "...", "A": "...", "P": "..."}`;
+Dati clinici specialistici (extras, JSON):
+${JSON.stringify(extrasObj)}
+
+Checklist (template, JSON con true/false/null):
+${JSON.stringify(checklistObj)}
+
+Restituisci il referto corretto in JSON: {"S": "...", "O": "...", "A": "...", "P": "...", "extras": {...}, "checklist": {...}}`;
 
             const response = await fetch('https://api.openai.com/v1/chat/completions', {
                 method: 'POST',
@@ -1702,6 +1740,15 @@ Restituisci il referto corretto in JSON: {"S": "...", "O": "...", "A": "...", "P
                 if (corrected.O) document.getElementById('soap-o').value = corrected.O;
                 if (corrected.A) document.getElementById('soap-a').value = corrected.A;
                 if (corrected.P) document.getElementById('soap-p').value = corrected.P;
+                if (corrected.extras && typeof corrected.extras === 'object') {
+                    currentTemplateExtras = { ...currentTemplateExtras, ...corrected.extras };
+                    try { renderTemplateExtras(); } catch (e) {}
+                }
+                if (corrected.checklist && typeof corrected.checklist === 'object') {
+                    currentSOAPChecklist = { ...currentSOAPChecklist, ...corrected.checklist };
+                    try { renderChecklistInSOAP(); } catch (e) {}
+                }
+                try { applyHideEmptyVisibility(); } catch (e) {}
             }
 
             // Track chat usage

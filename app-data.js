@@ -233,13 +233,15 @@ function loadData() {
 }
 
 // ============================================
-// DIARY
+// CLINICAL PROFILE
 // ============================================
 
 async function generateDiary() {
     showProgress(true);
     const patient = getPatientData();
     const lifestyle = getLifestyleData();
+    const vetName = (typeof getVetName === 'function') ? getVetName() : '';
+    const generatedDate = new Date().toLocaleDateString('it-IT');
     
     const historyText = (historyData || []).map(h => {
         const d = new Date(h.createdAt || h.date || Date.now()).toLocaleDateString('it-IT');
@@ -250,7 +252,7 @@ async function generateDiary() {
     const vitalsText = vitalsData.map(v => `${new Date(v.date).toLocaleDateString('it-IT')}: Peso ${v.weight}kg, T ${v.temp}°C`).join('\n') || 'Nessuno';
     const medsText = medications.map(m => `${m.name} ${m.dosage} ${m.frequency}`).join('\n') || 'Nessuno';
     
-    const prompt = `Genera un diario clinico per questo paziente veterinario.
+    const prompt = `Genera un profilo sanitario per questo paziente veterinario.
 
 PAZIENTE: ${patient.petName || 'N/D'}, ${patient.petSpecies || 'N/D'}, ${patient.petBreed || 'N/D'}, ${patient.petAge || 'N/D'}
 PROPRIETARIO: ${patient.ownerName || 'N/D'}
@@ -261,7 +263,8 @@ PARAMETRI VITALI: ${vitalsText}
 FARMACI: ${medsText}
 STORICO: ${historyText}
 
-Scrivi un diario clinico professionale e sintetico.`;
+Scrivi un profilo sanitario professionale e sintetico.
+Se inserisci una firma, usa il nome veterinario "${vetName || '[Nome del Veterinario]'}" e la data "${generatedDate}".`;
 
     try {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -274,11 +277,18 @@ Scrivi un diario clinico professionale e sintetico.`;
             throw new Error(err?.error?.message || `HTTP ${response.status}`);
         }
         const data = await response.json();
-        document.getElementById('diaryText').value = data.choices[0].message.content;
+        let content = data.choices[0].message.content;
+        if (content) {
+            if (vetName) {
+                content = content.replace(/\[Nome del Veterinario\]/gi, vetName);
+            }
+            content = content.replace(/\[Data\]/gi, generatedDate);
+        }
+        document.getElementById('diaryText').value = content;
         trackChatUsage('gpt-4o', data.usage);
         saveApiUsage();
         updateCostDisplay();
-        showToast('Diario generato', 'success');
+        showToast('Profilo sanitario generato', 'success');
     } catch (e) {
         showToast('Errore: ' + e.message, 'error');
     }
@@ -287,11 +297,11 @@ Scrivi un diario clinico professionale e sintetico.`;
 
 function saveDiary() {
     localStorage.setItem('ada_diary', document.getElementById('diaryText').value);
-    showToast('Diario salvato', 'success');
+    showToast('Profilo sanitario salvato', 'success');
 }
 
 function exportDiaryTXT() {
-    downloadFile(document.getElementById('diaryText').value, 'diario_clinico.txt', 'text/plain');
+    downloadFile(document.getElementById('diaryText').value, 'profilo_sanitario.txt', 'text/plain');
 }
 
 function exportDiaryPDF() {
@@ -312,7 +322,7 @@ function exportDiaryPDF() {
 
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
-    doc.text('Diario Clinico', 120, 18, { align: 'center' });
+    doc.text('Profilo sanitario', 120, 18, { align: 'center' });
 
     // Content
     doc.setTextColor(0, 0, 0);
@@ -335,7 +345,7 @@ function exportDiaryPDF() {
         y += 5;
     }
 
-    doc.save('diario_clinico_' + (patient?.petName || 'paziente') + '.pdf');
+    doc.save('profilo_sanitario_' + (patient?.petName || 'paziente') + '.pdf');
     showToast('PDF esportato', 'success');
 }
 
@@ -346,6 +356,27 @@ function exportDiaryPDF() {
 let qnaRecorder = null;
 let qnaChunks = [];
 let isRecordingQuestion = false;
+
+async function runQnaModerationCheck(text, kind) {
+    const content = (text || '').toString().trim();
+    if (!content) return false;
+    const response = await fetch('https://api.openai.com/v1/moderations', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'omni-moderation-latest', input: content })
+    });
+    if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Moderazione ${kind} fallita (HTTP ${response.status}): ${errText.substring(0, 120)}`);
+    }
+    const data = await response.json();
+    const flagged = data?.results?.[0]?.flagged;
+    if (flagged) {
+        showToast(`Contenuto non consentito nella ${kind}.`, 'error');
+        return false;
+    }
+    return true;
+}
 
 function toggleQuestionRecording() {
     if (isRecordingQuestion) {
@@ -418,12 +449,20 @@ async function completeQuestionRecording() {
 async function generateQnAAnswer() {
     const question = document.getElementById('qnaQuestion').value;
     if (!question) { showToast('Inserisci una domanda', 'error'); return; }
+
+    try {
+        const okQuestion = await runQnaModerationCheck(question, 'domanda');
+        if (!okQuestion) return;
+    } catch (e) {
+        showToast('Errore: ' + e.message, 'error');
+        return;
+    }
     
     showProgress(true);
     const patient = getPatientData();
     const lifestyle = getLifestyleData();
     
-    const prompt = `Sei un assistente veterinario. Rispondi SOLO a domande relative al pet.
+    const prompt = `Sei un assistente veterinario. Rispondi SOLO a domande su pet e animali in generale.
 
 PET: ${patient.petName || 'N/D'}, ${patient.petSpecies || 'N/D'}, ${patient.petBreed || 'N/D'}, Età: ${patient.petAge || 'N/D'}
 AMBIENTE: ${lifestyle.lifestyle || 'N/D'}, CONDIZIONI: ${lifestyle.knownConditions || 'Nessuna'}
@@ -432,7 +471,7 @@ ULTIMA DIAGNOSI: ${_getMostRecentDiagnosisText()}
 
 DOMANDA: "${question}"
 
-Se NON correlata al pet: "Mi dispiace, posso rispondere solo a domande sul tuo animale."
+Se NON correlata ad animali/pet: "Mi dispiace, posso rispondere solo a domande su animali e pet."
 Altrimenti rispondi in modo chiaro e rassicurante.`;
 
     try {
@@ -449,6 +488,12 @@ Altrimenti rispondi in modo chiaro e rassicurante.`;
         const content = data?.choices?.[0]?.message?.content;
         if (!content) {
             throw new Error('Risposta non valida dal modello');
+        }
+        const okAnswer = await runQnaModerationCheck(content, 'risposta');
+        if (!okAnswer) {
+            document.getElementById('qnaAnswer').value = 'Mi dispiace, non posso rispondere a questa domanda.';
+            showProgress(false);
+            return;
         }
         document.getElementById('qnaAnswer').value = content;
         trackChatUsage('gpt-4o', data.usage);

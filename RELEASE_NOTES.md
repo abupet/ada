@@ -1,5 +1,13 @@
 # Release Notes (cumulative)
 
+## v6.17.9 (2026-01-28)
+- **UX**: aggiunto pulsante di chiusura sidebar e nota in archivio per eliminare i referti con pressione prolungata.
+- **Referti**: correzioni vocali e traduzioni ora includono dati clinici specialistici e checklist; deduplica degli extra rispetto a S/O/A/P.
+- **Registrazione**: messaggi di trascrizione/generazione aggiornati, avvio automatico del referto e informazioni chunking nascoste quando il debug è disattivo.
+- **Profilo sanitario**: rinominato il Diario clinico, firma con nome veterinario e data di generazione, file export aggiornati.
+- **Domande & Risposte**: moderazione su domande/risposte e gestione robusta delle spiegazioni proprietario.
+- **Impostazioni**: API Key spostata in Debug e nuova sezione Informazioni clinica con logo collassabile.
+
 ## v6.17.8 (2026-01-28)
 - Aggiornato il numero di versione visibile nell'app e nei tool di supporto.
 - Archiviato il file di specifica completata e ripristinato il template vuoto.

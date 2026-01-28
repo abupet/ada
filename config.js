@@ -29,7 +29,7 @@ function getSaltForMode(mode) {
 }
 
 // Version
-const ADA_VERSION = '6.17.8';
+const ADA_VERSION = '6.17.9';
 
 // Template titles
 const templateTitles = {

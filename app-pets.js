@@ -514,10 +514,10 @@ async function saveDiary() {
             pet.diary = diaryText;
             pet.updatedAt = new Date().toISOString();
             await savePetToDB(pet);
-            showToast('✅ Diario salvato', 'success');
+            showToast('✅ Profilo sanitario salvato', 'success');
         }
     } else {
-        alert('⚠️ Errore: Seleziona un pet prima di salvare il diario.');
+        alert('⚠️ Errore: Seleziona un pet prima di salvare il profilo sanitario.');
     }
 }
 
