@@ -92,6 +92,26 @@ npm run test:regression
 
 ---
 
+### Suite CI (policy + smoke + regression)
+
+```bash
+npm run test:ci
+```
+
+### Suite CI con test long
+
+```bash
+npm run test:ci:real
+```
+
+### Solo test long
+
+```bash
+npm run test:ci:long
+```
+
+---
+
 ### Smoke su app deployata
 
 ```bash

@@ -41,14 +41,8 @@ jobs:
           nohup npm run serve > server.log 2>&1 &
           npx wait-on http://127.0.0.1:4173
 
-      - name: Policy checks
-        run: node tests/policy/policy-checks.js
-
-      - name: Smoke tests (MOCK)
-        run: npx playwright test --grep "@smoke"
-
-      - name: Regression tests (MOCK)
-        run: npx playwright test
+      - name: CI tests (MOCK)
+        run: npm run test:ci
 
       - name: Upload Playwright report (on failure)
         if: failure()
@@ -93,5 +87,5 @@ jobs:
             echo "### Useful commands (local)"
             echo "- npm ci"
             echo "- npm run serve  # port 4173"
-            echo "- npx playwright test --grep \"@smoke\""
+            echo "- npm run test:ci"
           } >> $GITHUB_STEP_SUMMARY
