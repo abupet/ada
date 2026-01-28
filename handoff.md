@@ -12,6 +12,7 @@ Questo documento definisce **come Codex deve lavorare su ADA**, includendo svilu
   - CI (PR) → MOCK, veloce, gate di merge
   - CI (REAL) → rete stretta + OpenAI reale, on‑demand e nightly
 - Fornire tracciabilità chiara (commit, PR, artifacts, commenti automatici)
+- Mantenere il baseline stabile (ADA v6.17.5) e le funzionalità critiche integre
 
 ---
 
@@ -32,6 +33,52 @@ Non lavorare mai direttamente su `main`.
 - Commit piccoli e mirati
 - Messaggi chiari e descrittivi
 - Evitare commit “miscellaneous”
+
+---
+
+## 2.3 Note di baseline (v6.17.5)
+
+- Il repository include già il fix per il bug critico su `app-recording.js`.
+- In questa versione i pulsanti della pagina **Visita** devono rimanere operativi.
+
+---
+
+## 2.4 Regole funzionali non negoziabili
+
+### Release notes
+
+- Deve esistere **un solo** file `RELEASE_NOTES.md` (cumulativo).
+- Ogni release aggiunge una nuova sezione `## vX.Y.Z`.
+- Non creare file di release notes separati.
+
+### Pagina Visita – pulsanti obbligatori
+
+Devono funzionare sempre:
+- 🎤 Microfono (`toggleRecording`)
+- 📁 Carica audio
+- 🧪 Carica audio lungo (test chunking)
+- 🧪 Carica testo lungo (test append)
+- 📄 Carica testo
+
+### Caricamento script
+
+- `app-recording.js` deve caricarsi senza errori di sintassi.
+- Se fallisce, i pulsanti Visita non funzionano.
+- Verificare che esistano funzioni come:
+  `toggleRecording`, `triggerAudioUpload`, `triggerLongAudioTestUpload`, `triggerLongTextTestUpload`.
+
+### Audio lungo
+
+- Limite upload OpenAI: 25MB per richiesta.
+- Non spezzare WebM/MP4 a byte nudi.
+- Usare chunking temporale su audio decodificato (es. WAV/PCM 16kHz mono).
+
+### Debug mode
+
+Quando “Debug attivo (per i test)” è abilitato:
+- `ADA.log` deve essere verboso.
+- Le funzionalità di debug/test devono essere visibili.
+- Gli errori devono essere loggati chiaramente.
 
 ---
 
@@ -204,6 +251,15 @@ Non aggirare mai i test.
 
 ---
 
+## 9.1 Cosa fare per primo
+
+- Leggere `AGENTS.md`
+- Leggere `RELEASE_NOTES.md`
+- Verificare manualmente i pulsanti della pagina Visita
+- Segnalare immediatamente eventuali errori di caricamento script
+
+---
+
 ## 10. Stato finale atteso
 
 Una versione è considerata **completata** solo quando:
@@ -216,4 +272,3 @@ Una versione è considerata **completata** solo quando:
 ---
 
 **Questo file è la fonte di verità per Codex.**
-

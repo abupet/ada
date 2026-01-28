@@ -56,6 +56,20 @@ npm run serve
 
 ---
 
+## Strumenti utili
+
+### Configuratore API Key (tool locale)
+
+Per generare `ENCRYPTED_KEY` e `SALT` da inserire in `config.js`, apri:
+
+```
+tools/configuratore.html
+```
+
+È una pagina standalone: aprila nel browser, compila i campi richiesti e copia i valori generati.
+
+---
+
 ## Test E2E (Playwright)
 
 ### Smoke tests
