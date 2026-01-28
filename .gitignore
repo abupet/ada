@@ -3,6 +3,9 @@
 .env.*
 !.env.example
 
+# dependencies
+node_modules/
+
 # playwright
 test-results/
 playwright-report/

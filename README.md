@@ -56,6 +56,20 @@ npm run serve
 
 ---
 
+## Strumenti utili
+
+### Configuratore API Key (tool locale)
+
+Per generare `ENCRYPTED_KEY` e `SALT` da inserire in `config.js`, apri:
+
+```
+tools/configuratore.html
+```
+
+È una pagina standalone: aprila nel browser, compila i campi richiesti e copia i valori generati.
+
+---
+
 ## Test E2E (Playwright)
 
 ### Smoke tests
@@ -88,6 +102,26 @@ Allowlist attuale necessaria per il corretto funzionamento dei test:
 
 ```bash
 npm run test:regression
+```
+
+---
+
+### Suite CI (policy + smoke + regression)
+
+```bash
+npm run test:ci
+```
+
+### Suite CI con test long
+
+```bash
+npm run test:ci:real
+```
+
+### Solo test long
+
+```bash
+npm run test:ci:long
 ```
 
 ---

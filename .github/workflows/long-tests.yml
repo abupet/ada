@@ -17,9 +17,68 @@ jobs:
           cache: "npm"
 
       - run: npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-ms-playwright-${{ hashFiles('package-lock.json') }}
+
       - run: npx playwright install --with-deps
+
+      - name: Start server
+        run: |
+          nohup npm run serve > server.log 2>&1 &
+          npx wait-on http://127.0.0.1:4173
 
       - name: Run long tests (manual)
         env:
           ADA_TEST_PASSWORD: ${{ secrets.ADA_TEST_PASSWORD }}
-        run: npx playwright test --project=chromium --grep "@""long"
+        run: npm run test:ci:long
+
+      - name: Upload Playwright report (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore
+
+      - name: Upload test-results (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/
+          if-no-files-found: ignore
+
+      - name: Upload server log (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-log
+          path: server.log
+          if-no-files-found: ignore
+
+      - name: Write CI summary
+        if: always()
+        run: |
+          {
+            echo "## Long tests summary"
+            echo ""
+            echo "- MODE: ${MODE:-}"
+            echo "- STRICT_NETWORK: ${STRICT_NETWORK:-}"
+            echo "- STRICT_ALLOW_HOSTS: ${STRICT_ALLOW_HOSTS:-}"
+            echo "- ALLOW_OPENAI: ${ALLOW_OPENAI:-}"
+            echo ""
+            echo "### Artifacts (available on failure)"
+            echo "- playwright-report"
+            echo "- test-results"
+            echo "- server-log"
+            echo ""
+            echo "### Useful commands (local)"
+            echo "- npm ci"
+            echo "- npm run serve  # port 4173"
+            echo "- npm run test:ci:long"
+          } >> $GITHUB_STEP_SUMMARY
