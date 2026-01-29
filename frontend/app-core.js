@@ -65,8 +65,10 @@ async function login() {
         }
     } catch (e) {}
 
-    if (apiKey && token) {
-        API_KEY = apiKey;
+    if (token) {
+        if (apiKey) {
+            API_KEY = apiKey;
+        }
         setAuthToken(token);
         const sessionKey = btoa(password + ':' + Date.now());
         localStorage.setItem('ada_session', sessionKey);
@@ -90,12 +92,12 @@ async function checkSession() {
             const apiKey = await decryptApiKey(password, getApiKeyMode());
             if (apiKey) {
                 API_KEY = apiKey;
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('appContainer').classList.add('active');
-                loadData();
-                initApp();
-                return;
             }
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appContainer').classList.add('active');
+            loadData();
+            initApp();
+            return;
         } catch (e) {}
     }
 }
