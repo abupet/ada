@@ -52,9 +52,22 @@ function _extractJsonArray(text) {
 async function login() {
     const password = document.getElementById('passwordInput').value;
     const apiKey = await decryptApiKey(password, getApiKeyMode());
+    let token = '';
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+        });
+        if (response.ok) {
+            const data = await response.json();
+            token = data?.token || '';
+        }
+    } catch (e) {}
 
-    if (apiKey) {
+    if (apiKey && token) {
         API_KEY = apiKey;
+        setAuthToken(token);
         const sessionKey = btoa(password + ':' + Date.now());
         localStorage.setItem('ada_session', sessionKey);
         document.getElementById('loginScreen').style.display = 'none';
@@ -69,7 +82,8 @@ async function login() {
 async function checkSession() {
     try { applyVersionInfo(); } catch (e) {}
     const session = localStorage.getItem('ada_session');
-    if (session) {
+    const token = getAuthToken();
+    if (session && token) {
         try {
             const decoded = atob(session);
             const password = decoded.split(':')[0];
@@ -88,7 +102,23 @@ async function checkSession() {
 
 function logout() {
     localStorage.removeItem('ada_session');
+    clearAuthToken();
     location.reload();
+}
+
+function handleAuthFailure() {
+    localStorage.removeItem('ada_session');
+    clearAuthToken();
+    API_KEY = null;
+    const loginScreen = document.getElementById('loginScreen');
+    const appContainer = document.getElementById('appContainer');
+    if (appContainer) appContainer.classList.remove('active');
+    if (loginScreen) loginScreen.style.display = 'flex';
+    const loginError = document.getElementById('loginError');
+    if (loginError) {
+        loginError.textContent = 'Sessione scaduta. Accedi di nuovo.';
+        loginError.style.display = 'block';
+    }
 }
 
 // ============================================
@@ -1282,9 +1312,9 @@ async function sendFullscreenCorrection() {
         const correctionText = transcribeResult.text;
         
         // Apply correction using GPT
-        const applyResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        const applyResponse = await fetchApi('/api/chat', {
             method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 model: 'gpt-4o',
                 messages: [
@@ -1897,9 +1927,9 @@ function updateSOAPLabels(lang) {
 }
 
 async function translateText(text, targetLang) {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetchApi('/api/chat', {
         method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             model: 'gpt-4o',
             messages: [{ role: 'user', content: `Traduci in ${langNames[targetLang]}. Rispondi SOLO con la traduzione:\n\n${text}` }],

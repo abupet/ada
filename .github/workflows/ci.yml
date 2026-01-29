@@ -26,6 +26,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install backend dependencies
+        run: npm install --prefix backend
+
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
@@ -38,8 +41,18 @@ jobs:
 
       - name: Start server
         run: |
+          nohup node backend/src/server.js > backend.log 2>&1 &
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:3000/api/health > /dev/null; then break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:3000/api/health > /dev/null
           nohup npm run serve > server.log 2>&1 &
-          npx wait-on http://127.0.0.1:4173
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:4173 > /dev/null; then break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:4173 > /dev/null
 
       - name: CI tests (MOCK)
         run: npm run test:ci
@@ -68,6 +81,14 @@ jobs:
           path: server.log
           if-no-files-found: ignore
 
+      - name: Upload backend log (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-log
+          path: backend.log
+          if-no-files-found: ignore
+
       - name: Write CI summary
         if: always()
         run: |
@@ -83,6 +104,7 @@ jobs:
             echo "- playwright-report"
             echo "- test-results"
             echo "- server-log"
+            echo "- backend-log"
             echo ""
             echo "### Useful commands (local)"
             echo "- npm ci"

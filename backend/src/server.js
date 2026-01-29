@@ -1,21 +1,30 @@
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 const jwt = require("jsonwebtoken");
 
+require("dotenv").config({ path: path.resolve(__dirname, "../../.env") });
+
 const app = express();
 
 const {
   ADA_LOGIN_PASSWORD,
+  ADA_TEST_PASSWORD,
   JWT_SECRET,
   FRONTEND_ORIGIN,
   TOKEN_TTL_SECONDS = "14400",
   RATE_LIMIT_PER_MIN = "60",
   PORT = "3000",
+  MODE,
+  CI,
 } = process.env;
 
 const ttlSeconds = Number.parseInt(TOKEN_TTL_SECONDS, 10) || 14400;
 const rateLimitPerMin = Number.parseInt(RATE_LIMIT_PER_MIN, 10) || 60;
+const isMockEnv = CI === "true" || MODE === "MOCK";
+const effectivePassword = ADA_LOGIN_PASSWORD || ADA_TEST_PASSWORD;
+const effectiveJwtSecret = isMockEnv ? JWT_SECRET || "dev-jwt-secret" : JWT_SECRET;
 const openaiKeyName = [
   "4f",
   "50",
@@ -66,16 +75,18 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.post("/auth/login", (req, res) => {
-  if (!ADA_LOGIN_PASSWORD || !JWT_SECRET) {
+  if (!effectivePassword || !effectiveJwtSecret) {
     return res.status(500).json({ error: "Server not configured" });
   }
 
   const { password } = req.body ?? {};
-  if (password !== ADA_LOGIN_PASSWORD) {
+  if (password !== effectivePassword) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  const token = jwt.sign({ sub: "ada-user" }, JWT_SECRET, { expiresIn: ttlSeconds });
+  const token = jwt.sign({ sub: "ada-user" }, effectiveJwtSecret, {
+    expiresIn: ttlSeconds,
+  });
   return res.json({ token, expiresIn: ttlSeconds });
 });
 
@@ -88,12 +99,12 @@ function requireJwt(req, res, next) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  if (!JWT_SECRET) {
+  if (!effectiveJwtSecret) {
     return res.status(500).json({ error: "Server not configured" });
   }
 
   try {
-    jwt.verify(token, JWT_SECRET);
+    jwt.verify(token, effectiveJwtSecret);
   } catch (error) {
     return res.status(401).json({ error: "Unauthorized" });
   }

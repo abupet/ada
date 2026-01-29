@@ -354,7 +354,7 @@ ISTRUZIONI IMPORTANTI:
         try {
             if (typeof logDebug === 'function') {
                 logDebug('SOAP_API_START', {
-                    endpoint: '/v1/chat/completions',
+                    endpoint: '/api/chat',
                     model: 'gpt-4o',
                     temperature: 0.3,
                     inputChars: (inputContent || '').length
@@ -362,10 +362,9 @@ ISTRUZIONI IMPORTANTI:
             }
         } catch (e) {}
 
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetchApi('/api/chat', {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + API_KEY,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -442,10 +441,9 @@ async function generateSOAPFallback(inputContent, transcriptionText, segmentsTex
 
     console.log('Using SOAP fallback without strict schema');
     
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetchApi('/api/chat', {
         method: 'POST',
         headers: {
-            'Authorization': 'Bearer ' + API_KEY,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -517,10 +515,9 @@ REGOLE:
 Rispondi SOLO con JSON valido con questa forma ESATTA:
 {"S":"...","O":"...","A":"...","P":"..."}`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetchApi('/api/chat', {
         method: 'POST',
         headers: {
-            'Authorization': 'Bearer ' + API_KEY,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -881,10 +878,9 @@ ${transcriptionText}
 ${soapPreview}
 `;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetchApi('/api/chat', {
         method: 'POST',
         headers: {
-            'Authorization': 'Bearer ' + API_KEY,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -1322,9 +1318,9 @@ Esame obiettivo: ${soap.o}
 Scrivi la spiegazione per il proprietario:`;
 
     try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetchApi('/api/chat', {
             method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 model: 'gpt-4o',
                 messages: [{ role: 'user', content: prompt }],
@@ -1486,9 +1482,9 @@ Rispondi in JSON: {"glossary": [{"term": "...", "meaning": "..."}]}
 Lingua: italiano.`;
 
     try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetchApi('/api/chat', {
             method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 model: 'gpt-4o',
                 messages: [{ role: 'user', content: prompt }],
@@ -1568,9 +1564,9 @@ Rispondi in JSON: {"faq": [{"question": "...", "answer": "..."}]}
 Le risposte devono essere chiare, rassicuranti e in italiano.`;
 
     try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetchApi('/api/chat', {
             method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 model: 'gpt-4o',
                 messages: [{ role: 'user', content: prompt }],
@@ -1713,9 +1709,9 @@ ${JSON.stringify(checklistObj)}
 
 Restituisci il referto corretto in JSON: {"S": "...", "O": "...", "A": "...", "P": "...", "extras": {...}, "checklist": {...}}`;
 
-            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            const response = await fetchApi('/api/chat', {
                 method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     model: 'gpt-4o',
                     messages: [{ role: 'user', content: prompt }],
