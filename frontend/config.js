@@ -2,6 +2,8 @@
 // API Keys are stored in api-keys.js
 
 let API_KEY = null;
+const ADA_AUTH_TOKEN_KEY = 'ada_auth_token';
+const API_BASE_URL = (window && window.ADA_API_BASE_URL) ? window.ADA_API_BASE_URL : 'http://127.0.0.1:3000';
 const ADA_API_KEY_MODE_KEY = 'ada_api_key_mode';
 
 function getApiKeyMode() {
@@ -18,6 +20,42 @@ function setApiKeyMode(mode) {
         const value = mode === 'costs' ? 'costs' : 'general';
         localStorage.setItem(ADA_API_KEY_MODE_KEY, value);
     } catch (e) {}
+}
+
+function setAuthToken(token) {
+    try {
+        if (token) {
+            localStorage.setItem(ADA_AUTH_TOKEN_KEY, token);
+        } else {
+            localStorage.removeItem(ADA_AUTH_TOKEN_KEY);
+        }
+    } catch (e) {}
+}
+
+function getAuthToken() {
+    try {
+        return localStorage.getItem(ADA_AUTH_TOKEN_KEY) || '';
+    } catch (e) {
+        return '';
+    }
+}
+
+function clearAuthToken() {
+    setAuthToken('');
+}
+
+async function fetchApi(path, options = {}) {
+    const headers = new Headers((options || {}).headers || {});
+    const token = getAuthToken();
+    if (token) headers.set('Authorization', `Bearer ${token}`);
+    const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
+    if (response.status === 401) {
+        clearAuthToken();
+        if (typeof handleAuthFailure === 'function') {
+            handleAuthFailure();
+        }
+    }
+    return response;
 }
 
 function getEncryptedKeyForMode(mode) {

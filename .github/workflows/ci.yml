@@ -12,6 +12,7 @@ jobs:
     env:
       MODE: MOCK
       STRICT_NETWORK: "0"
+      FRONTEND_ORIGIN: "http://localhost:4173"
 
     steps:
       - name: Checkout
