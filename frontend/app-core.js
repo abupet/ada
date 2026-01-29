@@ -74,13 +74,18 @@ async function requestAuthToken(password) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ password: password || '' })
         });
-        if (!response.ok) return null;
+        if (!response.ok) {
+            if (response.status === 401) {
+                return { token: null, hardFail: true };
+            }
+            return { token: null, hardFail: false };
+        }
         const data = await response.json();
-        if (!data?.token) return null;
+        if (!data?.token) return { token: null, hardFail: false };
         sessionStorage.setItem(ADA_AUTH_TOKEN_KEY, data.token);
-        return data.token;
+        return { token: data.token, hardFail: false };
     } catch (e) {
-        return null;
+        return { token: null, hardFail: false };
     }
 }
 
@@ -88,8 +93,8 @@ async function login() {
     const password = document.getElementById('passwordInput').value;
     document.getElementById('loginError').style.display = 'none';
 
-    const token = await requestAuthToken(password);
-    if (!token) {
+    const auth = await requestAuthToken(password);
+    if (auth.hardFail) {
         document.getElementById('loginError').style.display = 'block';
         return;
     }
@@ -116,8 +121,8 @@ async function checkSession() {
         try {
             const decoded = atob(session);
             const password = decoded.split(':')[0];
-            const token = await requestAuthToken(password);
-            if (!token) return;
+            const auth = await requestAuthToken(password);
+            if (auth.hardFail) return;
             const apiKey = await decryptApiKey(password, getApiKeyMode());
             if (!apiKey) return;
             API_KEY = apiKey;
