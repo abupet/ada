@@ -1,0 +1,34 @@
+<!-- docs/404.html v1 -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Loading…</title>
+    <meta http-equiv="refresh" content="0; url=/ada/" />
+    <script>
+      (function () {
+        try {
+          var basePath = "/ada";
+          var fullPath =
+            window.location.pathname + window.location.search + window.location.hash;
+
+          // Normalize: ensure it starts with basePath
+          // (it should, on GitHub Pages project sites)
+          if (fullPath.indexOf(basePath) !== 0) {
+            fullPath = basePath + fullPath;
+          }
+
+          // Store intended URL for index.html to restore.
+          sessionStorage.setItem("spa:redirect", fullPath);
+
+          // Redirect to the SPA entrypoint.
+          window.location.replace(basePath + "/");
+        } catch (e) {
+          window.location.replace("/ada/");
+        }
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>
