@@ -114,7 +114,8 @@ function requireJwt(req, res, next) {
   }
 
   try {
-    jwt.verify(token, effectiveJwtSecret);
+    const decoded = jwt.verify(token, effectiveJwtSecret);
+    req.user = decoded;
   } catch (error) {
     return res.status(401).json({ error: "Unauthorized" });
   }
@@ -123,6 +124,8 @@ function requireJwt(req, res, next) {
 }
 
 app.use("/api", requireJwt);
+
+const requireAuth = requireJwt;
 
 function getOpenAiKey() {
   const oaKey = process.env[openaiKeyName];
@@ -277,12 +280,6 @@ app.post("/api/tts", async (req, res) => {
   res.setHeader("Content-Type", response.headers.get("content-type") || "audio/mpeg");
   return res.status(200).send(audioBuffer);
 });
-
-
-
-// Pets CRUD + offline sync routes
-app.use(petsRouter({ requireAuth }));
-app.use(petsSyncRouter({ requireAuth }));
 
 app.listen(Number.parseInt(PORT, 10) || 3000, () => {
   // eslint-disable-next-line no-console
