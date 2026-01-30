@@ -1086,7 +1086,9 @@
 
     <!-- Scripts -->
     <script>
-      window.ADA_API_BASE_URL = "https://ada-au40.onrender.com";
+      if (!window.ADA_API_BASE_URL && !["localhost", "127.0.0.1"].includes(window.location.hostname)) {
+        window.ADA_API_BASE_URL = "https://ada-au40.onrender.com";
+      }
     </script>
     <script src="config.js"></script>
     <script src="app-core.js"></script>
