@@ -1085,6 +1085,11 @@
     <div id="progressBar" class="progress-bar" data-testid="progress-bar"><div class="progress-fill"></div></div>
 
     <!-- Scripts -->
+    <script>
+      if (!window.ADA_API_BASE_URL && !["localhost", "127.0.0.1"].includes(window.location.hostname)) {
+        window.ADA_API_BASE_URL = "https://ada-au40.onrender.com";
+      }
+    </script>
     <script src="config.js"></script>
     <script src="app-core.js"></script>
     <script src="app-recording.js"></script>
