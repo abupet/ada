@@ -8,6 +8,16 @@ const PETS_DB_NAME = 'ADA_Pets';
 const PETS_STORE_NAME = 'pets';
 const OUTBOX_STORE_NAME = 'outbox';
 const META_STORE_NAME = 'meta';
+
+function generateTmpPetId() {
+    let id = '';
+    try {
+        if (crypto && crypto.randomUUID) id = crypto.randomUUID();
+    } catch (e) {}
+    if (!id) id = Math.random().toString(16).slice(2) + '_' + Date.now();
+    return 'tmp_' + id;
+}
+
 let petsDB = null;
 let currentPetId = null;
 
@@ -163,13 +173,74 @@ async function setLastPetsCursor(cursor) {
 
 // NOTE: Outbox is not used in Step 1–2 yet, but store exists for Step 3.
 async function enqueueOutbox(op_type, payload) {
+    // STEP 3: Outbox write with coalescing (no network). Silent failures (no console.error).
     if (!petsDB) await initPetsDB();
-    return new Promise((resolve, reject) => {
+
+    const petId = payload && payload.id;
+
+    return new Promise((resolve) => {
         const tx = petsDB.transaction(OUTBOX_STORE_NAME, 'readwrite');
         const store = tx.objectStore(OUTBOX_STORE_NAME);
-        const req = store.add({ op_type, payload, created_at: new Date().toISOString() });
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
+
+        const existing = [];
+
+        const cursorReq = store.openCursor();
+        cursorReq.onsuccess = (e) => {
+            const cursor = e.target.result;
+            if (!cursor) {
+                // Apply coalescing rules
+                try {
+                    for (const item of existing) {
+                        const prev = item.value.op_type;
+
+                        if (prev === 'create' && op_type === 'update') {
+                            // create + update => keep create, merge payload
+                            store.put({ ...item.value, payload: { ...item.value.payload, ...payload } });
+                            return;
+                        }
+                        if (prev === 'update' && op_type === 'update') {
+                            // update + update => keep last update
+                            store.put({ ...item.value, payload });
+                            return;
+                        }
+                        if (prev === 'create' && op_type === 'delete') {
+                            // create + delete => remove both
+                            store.delete(item.key);
+                            return;
+                        }
+                        if (prev === 'update' && op_type === 'delete') {
+                            // update + delete => keep delete
+                            store.put({ ...item.value, op_type: 'delete', payload });
+                            return;
+                        }
+                    }
+
+                    // Default: add new outbox record
+                    store.add({ op_type, payload, created_at: new Date().toISOString() });
+                } catch (e2) {
+                    // silent
+                }
+                return;
+            }
+
+            try {
+                const v = cursor.value;
+                if (v && v.payload && v.payload.id === petId) {
+                    existing.push({ key: cursor.primaryKey, value: v });
+                }
+            } catch (e3) {
+                // silent
+            }
+            cursor.continue();
+        };
+        cursorReq.onerror = () => {
+            // fallback: try to add without coalescing
+            try { store.add({ op_type, payload, created_at: new Date().toISOString() }); } catch (e) {}
+        };
+
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => resolve(false);
+        tx.onabort = () => resolve(false);
     });
 }
 
@@ -447,7 +518,8 @@ async function saveCurrentPet() {
         pet.diary = document.getElementById('diaryText')?.value || '';
         
         await savePetToDB(pet);
-        await rebuildPetSelector(petId);
+    await enqueueOutbox('update', { id: normalizePetId(selector.value), patch: pet, base_version: null });
+    await rebuildPetSelector(petId);
         
         showToast('✅ Dati salvati!', 'success');
     }
@@ -473,7 +545,8 @@ async function deleteCurrentPet() {
     }
     
     await deletePetFromDB(petId);
-    currentPetId = null;
+        await enqueueOutbox('delete', { id: petId, base_version: null });
+        currentPetId = null;
     localStorage.removeItem('ada_current_pet_id');
     clearMainPetFields();
     await rebuildPetSelector('');
@@ -522,11 +595,15 @@ async function saveNewPet() {
     
     // Create new pet
     const newPet = createEmptyPet();
+    // Offline-first create: assign temporary id
+    newPet.id = generateTmpPetId();
+    newPet.updatedAt = new Date().toISOString();
+    newPet.base_version = null;
     newPet.patient = getNewPetPatientData();
     newPet.lifestyle = getNewPetLifestyleData();
     
     const newId = await savePetToDB(newPet);
-    
+    await enqueueOutbox('create', { id: newId, record: newPet });
     // Clear the add pet form
     clearNewPetFields();
     
