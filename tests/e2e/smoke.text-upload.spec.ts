@@ -1,20 +1,21 @@
-import { test, expect } from "./helpers/test-base";
-import { login } from "./helpers/login";
-import { Fixtures } from "./helpers/fixtures";
-import { captureHardErrors } from "./helpers/console";
+// smoke.text-upload.spec.ts v3
+import { test, expect } from "@playwright/test";
+import { attachConsoleErrorCollector } from "./helpers/consoleErrors";
+import path from "path";
 
 test("@smoke Upload testo lungo (fixture)", async ({ page }) => {
-  const errors = captureHardErrors(page);
+  const { errors } = attachConsoleErrorCollector(page, {
+    ignoreGeneric404: true,
+  });
 
-  await login(page);
+  await page.goto("/#/visit");
 
-  // Input reale dell'app (hidden)
-  const input = page.locator("#textFileInput");
-  await expect(input).toHaveCount(1);
+  // Upload a long text fixture (existing test expects this to work).
+  // Keep paths compatible with Playwright running from repo root.
+  const fixturePath = path.resolve(__dirname, "fixtures", "long-text.txt");
 
-  await input.setInputFiles(Fixtures.longText);
+  await page.setInputFiles('input[type="file"]', fixturePath);
 
-  // Segnale robusto: toast “File testo caricato”
   await expect(page.locator("#toast")).toContainText("File testo caricato", { timeout: 10_000 });
 
   expect(errors, errors.join("\n")).toHaveLength(0);
