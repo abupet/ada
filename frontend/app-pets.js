@@ -1,12 +1,9 @@
 // ADA v6.16.2 - Multi-Pet Management System
 
 // ============================================
-// DATABASE
+// DATABASE (Dexie IndexedDB)
 // ============================================
 
-const PETS_DB_NAME = 'ADA_Pets';
-const PETS_STORE_NAME = 'pets';
-let petsDB = null;
 let currentPetId = null;
 
 // Return currently selected pet id (from memory or localStorage)
@@ -17,73 +14,51 @@ function getCurrentPetId() {
     return Number.isFinite(n) ? n : null;
 }
 
-async function initPetsDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(PETS_DB_NAME, 1);
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => {
-            petsDB = request.result;
-            resolve(petsDB);
-        };
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains(PETS_STORE_NAME)) {
-                db.createObjectStore(PETS_STORE_NAME, { keyPath: 'id', autoIncrement: true });
-            }
-        };
-    });
+function normalizePetRecord(pet) {
+    if (!pet) return pet;
+    const normalized = { ...pet };
+    const patient = normalized.patient || {};
+    if (!normalized.name) normalized.name = patient.petName || '';
+    if (!normalized.species) normalized.species = patient.petSpecies || '';
+    if (!normalized.updatedAt) normalized.updatedAt = normalized.updated_at || new Date().toISOString();
+    if (!normalized.updated_at) normalized.updated_at = normalized.updatedAt || new Date().toISOString();
+    if (normalized.base_version === undefined && normalized.baseVersion !== undefined) {
+        normalized.base_version = normalized.baseVersion;
+    }
+    return normalized;
 }
 
 async function getAllPets() {
-    if (!petsDB) await initPetsDB();
-    return new Promise((resolve, reject) => {
-        const tx = petsDB.transaction(PETS_STORE_NAME, 'readonly');
-        const store = tx.objectStore(PETS_STORE_NAME);
-        const request = store.getAll();
-        request.onsuccess = () => resolve(request.result || []);
-        request.onerror = () => reject(request.error);
-    });
+    if (typeof ensureOfflineDbReady !== 'function') return [];
+    const db = await ensureOfflineDbReady();
+    if (!db) return [];
+    const pets = await db.pets.toArray();
+    return (pets || []).filter(pet => !pet?.deleted);
 }
 
 async function getPetById(id) {
-    if (!petsDB) await initPetsDB();
-    return new Promise((resolve, reject) => {
-        const tx = petsDB.transaction(PETS_STORE_NAME, 'readonly');
-        const store = tx.objectStore(PETS_STORE_NAME);
-        const request = store.get(id);
-        request.onsuccess = () => resolve(request.result);
-        try { tx.oncomplete = () => { backupPetsToLocalStorage(); }; } catch (e) {}
-        request.onerror = () => reject(request.error);
-    });
+    if (typeof ensureOfflineDbReady !== 'function') return null;
+    const db = await ensureOfflineDbReady();
+    if (!db) return null;
+    const pet = await db.pets.get(id);
+    if (pet?.deleted) return null;
+    try { backupPetsToLocalStorage(); } catch (e) {}
+    return normalizePetRecord(pet);
 }
 
 async function savePetToDB(pet) {
-    if (!petsDB) await initPetsDB();
-    return new Promise((resolve, reject) => {
-        const tx = petsDB.transaction(PETS_STORE_NAME, 'readwrite');
-        const store = tx.objectStore(PETS_STORE_NAME);
-        let request;
-        if (pet.id === null || pet.id === undefined) {
-            const petToSave = { ...pet };
-            delete petToSave.id;
-            request = store.add(petToSave);
-        } else {
-            request = store.put(pet);
-        }
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-    });
+    if (typeof ensureOfflineDbReady !== 'function') return null;
+    const db = await ensureOfflineDbReady();
+    if (!db) return null;
+    const normalized = normalizePetRecord({ ...pet });
+    return db.pets.put(normalized);
 }
 
 async function deletePetFromDB(id) {
-    if (!petsDB) await initPetsDB();
-    return new Promise((resolve, reject) => {
-        const tx = petsDB.transaction(PETS_STORE_NAME, 'readwrite');
-        const store = tx.objectStore(PETS_STORE_NAME);
-        const request = store.delete(id);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-    });
+    if (typeof ensureOfflineDbReady !== 'function') return;
+    const db = await ensureOfflineDbReady();
+    if (!db) return;
+    await db.pets.delete(id);
 }
 
 // ============================================
@@ -93,8 +68,13 @@ async function deletePetFromDB(id) {
 function createEmptyPet() {
     return {
         id: null,
+        name: '',
+        species: '',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        base_version: null,
+        deleted: false,
         patient: { petName: '', petSpecies: '', petBreed: '', petAge: '', petSex: '', petWeight: '', petMicrochip: '', ownerName: '', ownerPhone: '', visitDate: '' },
         lifestyle: { lifestyle: '', household: '', activityLevel: '', dietType: '', dietPreferences: '', knownConditions: '', currentMeds: '', behaviorNotes: '', seasonContext: '', location: '' },
         photos: [],
@@ -104,6 +84,15 @@ function createEmptyPet() {
         appointments: [],
         diary: ''
     };
+}
+
+function syncPetSummaryFields(pet) {
+    if (!pet) return;
+    const patient = pet.patient || {};
+    pet.name = patient.petName || pet.name || '';
+    pet.species = patient.petSpecies || pet.species || '';
+    pet.updatedAt = new Date().toISOString();
+    pet.updated_at = pet.updatedAt;
 }
 
 
@@ -155,8 +144,8 @@ async function rebuildPetSelector(selectId = null) {
     
     let html = '<option value="">-- Seleziona Pet --</option>';
     pets.forEach(pet => {
-        const name = pet.patient?.petName || 'Pet ' + pet.id;
-        const species = pet.patient?.petSpecies || 'N/D';
+        const name = pet.patient?.petName || pet.name || 'Pet ' + pet.id;
+        const species = pet.patient?.petSpecies || pet.species || 'N/D';
         html += `<option value="${pet.id}">${name} (${species})</option>`;
     });
     selector.innerHTML = html;
@@ -217,7 +206,6 @@ async function saveCurrentPetDataSilent() {
     
     const pet = await getPetById(currentPetId);
     if (pet) {
-        pet.updatedAt = new Date().toISOString();
         pet.patient = getPatientData();
         pet.lifestyle = getLifestyleData();
         pet.photos = photos;
@@ -226,6 +214,7 @@ async function saveCurrentPetDataSilent() {
         pet.medications = medications;
         pet.appointments = appointments;
         pet.diary = document.getElementById('diaryText')?.value || '';
+        syncPetSummaryFields(pet);
         await savePetToDB(pet);
     }
 }
@@ -260,7 +249,6 @@ async function saveCurrentPet() {
     const pet = await getPetById(petId);
     
     if (pet) {
-        pet.updatedAt = new Date().toISOString();
         pet.patient = getPatientData();
         pet.lifestyle = getLifestyleData();
         pet.photos = photos;
@@ -269,6 +257,7 @@ async function saveCurrentPet() {
         pet.medications = medications;
         pet.appointments = appointments;
         pet.diary = document.getElementById('diaryText')?.value || '';
+        syncPetSummaryFields(pet);
         
         await savePetToDB(pet);
         await rebuildPetSelector(petId);
@@ -348,6 +337,7 @@ async function saveNewPet() {
     const newPet = createEmptyPet();
     newPet.patient = getNewPetPatientData();
     newPet.lifestyle = getNewPetLifestyleData();
+    syncPetSummaryFields(newPet);
     
     const newId = await savePetToDB(newPet);
     
@@ -398,7 +388,8 @@ function clearMainPetFields() {
 }
 
 function loadPetIntoMainFields(pet) {
-    setPatientData(pet.patient || {});
+    const patientData = pet.patient || { petName: pet.name || '', petSpecies: pet.species || '' };
+    setPatientData(patientData);
     setLifestyleData(pet.lifestyle || {});
     photos = pet.photos || [];
     vitalsData = pet.vitalsData || [];
@@ -492,13 +483,13 @@ async function saveData() {
     if (currentPetId) {
         const pet = await getPetById(currentPetId);
         if (pet) {
-            pet.updatedAt = new Date().toISOString();
             pet.photos = photos;
             pet.vitalsData = vitalsData;
             pet.historyData = historyData;
             pet.medications = medications;
             pet.appointments = appointments;
             pet.diary = document.getElementById('diaryText')?.value || '';
+            syncPetSummaryFields(pet);
             await savePetToDB(pet);
         }
     }
@@ -512,7 +503,7 @@ async function saveDiary() {
         const pet = await getPetById(currentPetId);
         if (pet) {
             pet.diary = diaryText;
-            pet.updatedAt = new Date().toISOString();
+            syncPetSummaryFields(pet);
             await savePetToDB(pet);
             showToast('✅ Profilo sanitario salvato', 'success');
         }
@@ -527,11 +518,64 @@ async function savePatient() {
 }
 
 // ============================================
+// OFFLINE BOOTSTRAP (PULL -> INDEXEDDB)
+// ============================================
+
+async function pullPetsFromServer() {
+    try {
+        if (typeof fetchApi !== 'function') return [];
+        const response = await fetchApi('/api/sync/pets/pull');
+        if (!response.ok) return [];
+        const data = await response.json();
+        const pets = Array.isArray(data) ? data : (data?.pets || data?.data || []);
+        return Array.isArray(pets) ? pets : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function normalizePulledPet(pet) {
+    const normalized = { ...pet };
+    normalized.name = normalized.name || normalized.patient?.petName || '';
+    normalized.species = normalized.species || normalized.patient?.petSpecies || '';
+    if (!normalized.patient) {
+        normalized.patient = { petName: normalized.name || '', petSpecies: normalized.species || '' };
+    }
+    normalized.updated_at = normalized.updated_at || normalized.updatedAt || new Date().toISOString();
+    normalized.updatedAt = normalized.updatedAt || normalized.updated_at;
+    if (normalized.base_version === undefined && normalized.baseVersion !== undefined) {
+        normalized.base_version = normalized.baseVersion;
+    }
+    return normalized;
+}
+
+async function syncPetsFromServer() {
+    if (!navigator.onLine) return;
+    if (typeof ensureOfflineDbReady !== 'function') return;
+    const db = await ensureOfflineDbReady();
+    if (!db) return;
+
+    const pulledPets = await pullPetsFromServer();
+    if (!pulledPets.length) return;
+
+    const normalizedPets = pulledPets.map(normalizePulledPet);
+    await db.pets.bulkPut(normalizedPets);
+
+    const selectedId = getCurrentPetId();
+    await rebuildPetSelector(selectedId !== null ? selectedId : '');
+    if (selectedId) {
+        const pet = await getPetById(selectedId);
+        if (pet) loadPetIntoMainFields(pet);
+    }
+    await updateSelectedPetHeaders();
+}
+
+// ============================================
 // INITIALIZATION
 // ============================================
 
 async function initMultiPetSystem() {
-    await initPetsDB();
+    await ensureOfflineDbReady();
     // Restore from LocalStorage backup if IndexedDB is empty (robustness on some browsers)
     try { await restorePetsFromLocalStorageIfNeeded(); } catch (e) {}
     
@@ -551,6 +595,7 @@ async function initMultiPetSystem() {
                 migratePet.medications = JSON.parse(localStorage.getItem('ada_medications') || '[]');
                 migratePet.appointments = JSON.parse(localStorage.getItem('ada_appointments') || '[]');
                 migratePet.diary = localStorage.getItem('ada_diary') || '';
+                syncPetSummaryFields(migratePet);
                 const newId = await savePetToDB(migratePet);
                 currentPetId = newId;
                 localStorage.setItem('ada_current_pet_id', String(newId));
@@ -576,6 +621,9 @@ async function initMultiPetSystem() {
     await updateSelectedPetHeaders();
 
     updateSaveButtonState();
+
+    // Non-blocking online pull (best-effort)
+    try { syncPetsFromServer().catch(() => {}); } catch (e) {}
 }
 
 
@@ -598,14 +646,14 @@ async function updateSelectedPetHeaders() {
     }
 
     els.forEach(el => {
-        if (!pet || !pet.patient) {
+        if (!pet || (!pet.patient && !pet.name && !pet.species)) {
             el.textContent = '🐾 Seleziona un pet';
             el.classList.remove('selected-pet-header--visible');
             return;
         }
 
-        const name = (pet.patient.petName || 'Paziente').toString().trim();
-        const species = (pet.patient.petSpecies || '').toString().trim();
+        const name = ((pet.patient && pet.patient.petName) || pet.name || 'Paziente').toString().trim();
+        const species = ((pet.patient && pet.patient.petSpecies) || pet.species || '').toString().trim();
         const parts = [name];
         if (species) parts.push(species);
         el.textContent = '🐾 ' + parts.join(' • ');
