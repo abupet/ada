@@ -6,6 +6,8 @@
 
 const PETS_DB_NAME = 'ADA_Pets';
 const PETS_STORE_NAME = 'pets';
+const OUTBOX_STORE_NAME = 'outbox';
+const META_STORE_NAME = 'meta';
 let petsDB = null;
 let currentPetId = null;
 
@@ -19,7 +21,7 @@ function getCurrentPetId() {
 
 async function initPetsDB() {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open(PETS_DB_NAME, 1);
+        const request = indexedDB.open(PETS_DB_NAME, 2);
         request.onerror = () => reject(request.error);
         request.onsuccess = () => {
             petsDB = request.result;
@@ -29,6 +31,13 @@ async function initPetsDB() {
             const db = event.target.result;
             if (!db.objectStoreNames.contains(PETS_STORE_NAME)) {
                 db.createObjectStore(PETS_STORE_NAME, { keyPath: 'id', autoIncrement: true });
+            }
+
+            if (!db.objectStoreNames.contains(OUTBOX_STORE_NAME)) {
+                db.createObjectStore(OUTBOX_STORE_NAME, { keyPath: 'id', autoIncrement: true });
+            }
+            if (!db.objectStoreNames.contains(META_STORE_NAME)) {
+                db.createObjectStore(META_STORE_NAME, { keyPath: 'key' });
             }
         };
     });
@@ -84,6 +93,146 @@ async function deletePetFromDB(id) {
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
     });
+}
+
+// ============================================
+// META / OUTBOX (offline-first scaffolding)
+// ============================================
+
+async function metaGet(key) {
+    if (!petsDB) await initPetsDB();
+    return new Promise((resolve, reject) => {
+        const tx = petsDB.transaction(META_STORE_NAME, 'readonly');
+        const store = tx.objectStore(META_STORE_NAME);
+        const req = store.get(key);
+        req.onsuccess = () => resolve(req.result ? req.result.value : null);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+async function metaSet(key, value) {
+    if (!petsDB) await initPetsDB();
+    return new Promise((resolve, reject) => {
+        const tx = petsDB.transaction(META_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(META_STORE_NAME);
+        const req = store.put({ key, value });
+        req.onsuccess = () => resolve(true);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+async function getOrCreateDeviceId() {
+    // Stored in meta; fallback to localStorage for robustness
+    const META_KEY = 'device_id';
+    let existing = null;
+    try { existing = await metaGet(META_KEY); } catch (e) {}
+    if (existing) return existing;
+    try {
+        const ls = localStorage.getItem('ada_device_id');
+        if (ls) {
+            try { await metaSet(META_KEY, ls); } catch (e) {}
+            return ls;
+        }
+    } catch (e) {}
+
+    let id = '';
+    try {
+        if (crypto && crypto.randomUUID) id = crypto.randomUUID();
+    } catch (e) {}
+    if (!id) id = 'dev_' + Math.random().toString(16).slice(2) + '_' + Date.now();
+    try { await metaSet(META_KEY, id); } catch (e) {}
+    try { localStorage.setItem('ada_device_id', id); } catch (e) {}
+    return id;
+}
+
+async function getLastPetsCursor() {
+    try { return (await metaGet('pets_last_cursor')) || ''; } catch (e) { return ''; }
+}
+
+async function setLastPetsCursor(cursor) {
+    try { await metaSet('pets_last_cursor', cursor || ''); } catch (e) {}
+}
+
+// NOTE: Outbox is not used in Step 1–2 yet, but store exists for Step 3.
+async function enqueueOutbox(op_type, payload) {
+    if (!petsDB) await initPetsDB();
+    return new Promise((resolve, reject) => {
+        const tx = petsDB.transaction(OUTBOX_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(OUTBOX_STORE_NAME);
+        const req = store.add({ op_type, payload, created_at: new Date().toISOString() });
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+// ============================================
+// STEP 2 — PULL (safe, non-blocking)
+// ============================================
+
+async function applyRemotePets(items) {
+    if (!Array.isArray(items) || items.length === 0) return;
+    // Upsert into pets store; support soft-delete
+    if (!petsDB) await initPetsDB();
+    await new Promise((resolve, reject) => {
+        const tx = petsDB.transaction(PETS_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(PETS_STORE_NAME);
+        for (const item of items) {
+            if (!item) continue;
+            const id = item.id;
+            if (id === undefined || id === null) continue;
+            if (item.deleted === true || item.is_deleted === true) {
+                store.delete(id);
+            } else {
+                store.put(item);
+            }
+        }
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => reject(tx.error || new Error('applyRemotePets failed'));
+    });
+}
+
+async function pullPetsIfOnline() {
+    // Avoid side-effects if not authenticated (prevents smoke-test flakiness)
+    try {
+        if (typeof getAuthToken === 'function') {
+            const t = getAuthToken();
+            if (!t) return;
+        }
+    } catch (e) { return; }
+
+    if (!navigator.onLine) return;
+    if (typeof fetchApi !== 'function') return;
+
+    const device_id = await getOrCreateDeviceId();
+    const cursor = await getLastPetsCursor();
+
+    // Be tolerant to backend response shapes
+    const qs = new URLSearchParams();
+    if (cursor) qs.set('cursor', cursor);
+    qs.set('device_id', device_id);
+
+    let resp;
+    try {
+        resp = await fetchApi(`/sync/pets/pull?${qs.toString()}`, { method: 'GET' });
+    } catch (e) {
+        return; // silent
+    }
+    if (!resp || !resp.ok) return;
+
+    let data = null;
+    try { data = await resp.json(); } catch (e) { return; }
+
+    const items =
+        Array.isArray(data) ? data :
+        Array.isArray(data?.pets) ? data.pets :
+        Array.isArray(data?.items) ? data.items :
+        Array.isArray(data?.changes) ? data.changes :
+        [];
+
+    await applyRemotePets(items);
+
+    const nextCursor = data?.next_cursor || data?.cursor || data?.last_cursor || '';
+    if (nextCursor) await setLastPetsCursor(nextCursor);
 }
 
 // ============================================
@@ -560,6 +709,8 @@ async function initMultiPetSystem() {
     
     await rebuildPetSelector();
     
+    // Step 2: non-blocking pull (updates local DB when online)
+    try { pullPetsIfOnline(); } catch (e) {}
     // Restore last selected pet
     const lastPetId = localStorage.getItem('ada_current_pet_id');
     if (lastPetId) {
