@@ -2,12 +2,12 @@
   "name": "repo",
   "version": "1.0.0",
   "description": "",
-  "main": "frontend/api-keys.js",
+  "main": "docs/api-keys.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "serve": "http-server frontend -p 4173 -c-1",
+    "serve": "http-server docs -p 4173 -c-1",
     "test": "npm run test:smoke && npm run test:policy",
     "test:smoke": "playwright test --project=chromium --grep @smoke",
     "test:regression": "playwright test --project=chromium",

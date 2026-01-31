@@ -94,7 +94,7 @@ REAL configuration:
 Automatically applied:
 - ci
 - tests
-- frontend
+- docs
 - backend
 - docs
 

@@ -179,7 +179,7 @@ Il workflow `PR Labeler` applica automaticamente label in base ai file modificat
 
 - `ci`
 - `tests`
-- `frontend`
+- `docs`
 - `backend`
 - `docs`
 
