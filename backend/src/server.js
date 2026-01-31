@@ -127,11 +127,13 @@ app.use("/api", requireJwt);
 
 const requireAuth = requireJwt;
 
+
 // --- Pets routes (offline sync + CRUD) ---
-app.use(petsRouter({ requireAuth }));
-app.use(petsSyncRouter({ requireAuth }));
-
-
+// CI may run without DATABASE_URL; avoid crashing the server in that case.
+if (process.env.DATABASE_URL) {
+  app.use(petsRouter({ requireAuth }));
+  app.use(petsSyncRouter({ requireAuth }));
+}
 
 function getOpenAiKey() {
   const oaKey = process.env[openaiKeyName];
