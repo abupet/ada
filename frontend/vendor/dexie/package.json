@@ -1,7 +1,0 @@
-{
-  "name": "dexie",
-  "version": "3.2.4-local",
-  "description": "Minimal Dexie-compatible wrapper for ADA offline use.",
-  "main": "dexie.min.js",
-  "license": "MIT"
-}
