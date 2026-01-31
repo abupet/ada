@@ -11,12 +11,20 @@ const META_STORE_NAME = 'meta';
 let petsDB = null;
 let currentPetId = null;
 
+function normalizePetId(raw) {
+    if (raw === null || raw === undefined) return null;
+    if (typeof raw === 'number') return Number.isFinite(raw) ? raw : null;
+    const value = String(raw).trim();
+    if (!value) return null;
+    if (/^\d+$/.test(value)) return Number(value);
+    return value;
+}
+
 // Return currently selected pet id (from memory or localStorage)
 function getCurrentPetId() {
-    if (currentPetId) return currentPetId;
+    if (currentPetId !== null && currentPetId !== undefined) return currentPetId;
     const raw = localStorage.getItem('ada_current_pet_id');
-    const n = parseInt(raw || '', 10);
-    return Number.isFinite(n) ? n : null;
+    return normalizePetId(raw);
 }
 
 async function initPetsDB() {
@@ -351,7 +359,7 @@ async function onPetSelectorChange(selectElement) {
     const value = selectElement.value;
     
     // FIRST: Save current pet data before switching
-    if (currentPetId) {
+    if (currentPetId !== null && currentPetId !== undefined) {
         await saveCurrentPetDataSilent();
     }
     
@@ -362,7 +370,7 @@ async function onPetSelectorChange(selectElement) {
         clearMainPetFields();
     } else {
         // Pet selected - load it
-        const petId = parseInt(value);
+        const petId = normalizePetId(value);
         const pet = await getPetById(petId);
         if (pet) {
             currentPetId = petId;
@@ -424,7 +432,7 @@ async function saveCurrentPet() {
         return;
     }
     
-    const petId = parseInt(selector.value);
+    const petId = normalizePetId(selector.value);
     const pet = await getPetById(petId);
     
     if (pet) {
@@ -456,7 +464,7 @@ async function deleteCurrentPet() {
         return;
     }
     
-    const petId = parseInt(selector.value);
+    const petId = normalizePetId(selector.value);
     const pet = await getPetById(petId);
     const petName = pet?.patient?.petName || 'questo pet';
     
@@ -733,9 +741,10 @@ async function initMultiPetSystem() {
     // Restore last selected pet
     const lastPetId = localStorage.getItem('ada_current_pet_id');
     if (lastPetId) {
-        const pet = await getPetById(parseInt(lastPetId));
+        const normalizedLastPetId = normalizePetId(lastPetId);
+        const pet = await getPetById(normalizedLastPetId);
         if (pet) {
-            currentPetId = parseInt(lastPetId);
+            currentPetId = normalizedLastPetId;
             loadPetIntoMainFields(pet);
             await updateSelectedPetHeaders();
             const selector = document.getElementById('petSelector');
