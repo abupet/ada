@@ -1,5 +1,8 @@
 # Release Notes (cumulative)
 
+## v6.17.10 (2026-01-28)
+- **UI**: la pagina "Visita" è stata rinominata in "Registrazione".
+
 ## v6.17.9 (2026-01-28)
 - **UX**: aggiunto pulsante di chiusura sidebar e nota in archivio per eliminare i referti con pressione prolungata.
 - **Referti**: correzioni vocali e traduzioni ora includono dati clinici specialistici e checklist; deduplica degli extra rispetto a S/O/A/P.

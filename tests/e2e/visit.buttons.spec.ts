@@ -1,7 +1,7 @@
 import { test, expect } from "./helpers/test-base";
 import { login } from "./helpers/login";
 
-test("@smoke Visita: microfono e upload non sono inerti", async ({ page }) => {
+test("@smoke Registrazione: microfono e upload non sono inerti", async ({ page }) => {
   await login(page);
 
   const recordBtn = page.getByTestId("record-button");

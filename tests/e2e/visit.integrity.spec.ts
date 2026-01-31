@@ -2,7 +2,7 @@ import { test, expect } from "./helpers/test-base";
 import { login } from "./helpers/login";
 import { captureHardErrors } from "./helpers/console";
 
-test("@smoke Visita: nessun errore console + app-recording.js caricato", async ({ page }) => {
+test("@smoke Registrazione: nessun errore console + app-recording.js caricato", async ({ page }) => {
   const errors = captureHardErrors(page);
 
   await login(page);
