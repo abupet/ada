@@ -125,6 +125,14 @@ function requireJwt(req, res, next) {
 
 app.use("/api", requireJwt);
 
+// --- Pets routes (offline sync + CRUD) ---
+try {
+  app.use(petsRouter({ requireAuth }));
+  app.use(petsSyncRouter({ requireAuth }));
+} catch (_e) {
+  // silent: keep server boot even if optional modules change
+}
+
 const requireAuth = requireJwt;
 
 function getOpenAiKey() {
